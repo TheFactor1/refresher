@@ -6,85 +6,163 @@
     <string name="notification_title">Refresher</string>
     <string name="notification_text">Restarting a scheduled app…</string>
 
-    <string name="main_subtitle">Refresh apps on a timer, even while the TV sleeps</string>
-    <string name="rules_header">Restart rules</string>
-    <string name="add_rule">Add app</string>
-    <string name="setup_and_permissions">Setup &amp; permissions</string>
-    <string name="master_enabled">Schedules active</string>
-    <string name="no_rules">No rules yet. Choose \"Add app\" to pick an app and an interval.</string>
-    <string name="recent_activity">Recent activity</string>
-    <string name="status_header">Kill method</string>
-    <string name="rule_section_relaunch">Relaunch</string>
-    <string name="rule_section_when">When to run</string>
-    <string name="no_activity">Nothing has run yet.</string>
-    <string name="clear_log">Clear log</string>
+    <!-- Home: the headline answers "is it working?" -->
+    <string name="headline_working">Everything\'s working</string>
+    <string name="headline_no_apps">Add an app to get started</string>
+    <string name="headline_paused_all">Restarts are paused</string>
+    <string name="headline_paused_each">All your apps are paused</string>
+    <string name="headline_cannot_stop">Refresher can\'t stop apps yet</string>
+    <string name="headline_shizuku_missing">Refresher needs Shizuku</string>
+    <string name="headline_shizuku_stopped">Restarts are paused</string>
+    <string name="headline_shizuku_no_permission">Shizuku needs your OK</string>
+    <string name="headline_last_failed">The last restart didn\'t work</string>
+    <string name="headline_might_miss">Restarts might be missed</string>
 
-    <string name="pick_app_title">Pick an app to restart</string>
-    <string name="show_system_apps">Show system apps</string>
-    <string name="system_app">system</string>
-    <string name="no_launcher_entry">no launcher entry — kill only</string>
+    <string name="sub_no_apps">Refresher restarts apps on a timer, even while the TV sleeps.</string>
+    <string name="sub_paused_all">Nothing will be restarted until you turn restarts back on.</string>
+    <string name="sub_paused_each">Open an app below to resume it.</string>
+    <string name="sub_cannot_stop">It needs Shizuku, device owner or root to stop other apps. Setup walks you through it.</string>
+    <string name="sub_shizuku_missing">Shizuku is what lets Refresher stop other apps. Get it once and the rest is automatic.</string>
+    <string name="sub_shizuku_stopped">Shizuku stopped, probably when the TV restarted, so apps can\'t be restarted.</string>
+    <string name="sub_shizuku_no_permission">Shizuku is running but hasn\'t allowed Refresher to use it yet.</string>
+    <string name="sub_last_failed">%1$s at %2$s: %3$s</string>
+    <string name="sub_might_miss">%1$s, so a restart could be late or skipped.</string>
+    <string name="sub_last_and_next">Last restart %1$s · %2$s · %3$s</string>
+    <string name="sub_next_only">No restarts yet · %1$s</string>
+    <string name="next_at">next at %1$s</string>
+    <string name="next_when_asleep">next once the TV sleeps</string>
+    <string name="sub_last_only">Last restart %1$s · %2$s</string>
 
-    <string name="interval_label">Restart every</string>
-    <string name="rule_enabled">Rule enabled</string>
-    <string name="rule_relaunch">Relaunch after killing</string>
-    <string name="rule_wake_screen">Wake the screen for the relaunch</string>
-    <string name="rule_skip_screen_on">Skip while the screen is on</string>
-    <string name="relaunch_delay_label">Wait before relaunching</string>
-    <string name="save">Save</string>
-    <string name="delete">Delete</string>
-    <string name="run_now">Run now</string>
-    <string name="run_now_started">Running now — check Recent activity in a few seconds</string>
+    <string name="fix_add_app">Add an app</string>
+    <string name="fix_resume">Turn restarts back on</string>
+    <string name="fix_start_shizuku">Start Shizuku</string>
+    <string name="fix_start_shizuku_hint">Takes a few seconds. No cable or computer needed.</string>
+    <string name="fix_grant_shizuku">Allow</string>
+    <string name="fix_open_setup">Open Setup</string>
+    <string name="fix_open_activity">See what happened</string>
+    <string name="fix_working">Starting Shizuku…</string>
+    <string name="fix_failed">Couldn\'t start Shizuku: %1$s</string>
+
+    <string name="apps_header">Apps</string>
+    <string name="needs_header">Needed to restart apps</string>
+    <string name="add_app">Add an app</string>
+    <string name="add_app_hint">Pick an app and how often to restart it</string>
+
+    <string name="chip_shizuku_ok">Shizuku running</string>
+    <string name="chip_shizuku_bad">Shizuku not running</string>
+    <string name="chip_auto_start_ok">Starts after a reboot</string>
+    <string name="chip_auto_start_bad">Won\'t start after a reboot</string>
+    <string name="chip_exact_ok">Exact timing</string>
+    <string name="chip_exact_bad">No exact timing</string>
+    <string name="chip_battery_ok">Battery saving off</string>
+    <string name="chip_battery_bad">Battery saving on</string>
+    <string name="chip_background_ok">Opens apps in the background</string>
+    <string name="chip_background_bad">Can\'t open apps in the background</string>
+    <string name="chip_activity">Activity</string>
+
+    <!-- App cards -->
+    <string name="card_every_asleep">Every %1$s, while the TV sleeps</string>
+    <string name="card_every">Every %1$s</string>
+    <string name="card_restarted">Restarted %1$s</string>
+    <string name="card_failed">Didn\'t work %1$s</string>
+    <string name="card_not_run">Next at %1$s</string>
+    <string name="card_waiting">Due · waiting for the TV to sleep</string>
+    <string name="card_paused">Paused</string>
+
+    <!-- Rule -->
+    <string name="crumb_apps">Refresher › Apps</string>
+    <string name="rule_interval">Restart every</string>
+    <string name="rule_interval_hint">Left and right to change</string>
+    <string name="rule_asleep">Only while the TV sleeps</string>
+    <string name="rule_asleep_hint">Skips a restart if the screen is on</string>
+    <string name="rule_reopen">Open it again afterwards</string>
+    <string name="rule_reopen_hint">Off: it\'s stopped and stays closed</string>
+    <string name="rule_reopen_none">This app can\'t be opened from the home screen, so it\'s only stopped</string>
+    <string name="rule_delay">Wait before opening it</string>
+    <string name="rule_delay_hint">Gives the app time to close fully</string>
+    <string name="rule_wake">Wake the screen to open it</string>
+    <string name="rule_wake_hint">Off: it opens in the dark, then goes back to Home</string>
+    <string name="rule_restart_now">Restart now</string>
+    <string name="rule_pause">Pause this app</string>
+    <string name="rule_resume">Resume this app</string>
+    <string name="rule_remove">Remove</string>
+    <string name="rule_remove_confirm">Press again to remove</string>
+    <string name="step_less" translatable="false">‹</string>
+    <string name="step_more" translatable="false">›</string>
+    <string name="rule_status_next">Next at %1$s</string>
+    <string name="rule_status_waiting">Due · waits for the TV to sleep</string>
+    <string name="rule_status_last">Restarted %1$s · %2$s</string>
+
+    <!-- Restart now card -->
+    <string name="restarting">Restarting %1$s</string>
+    <string name="restart_started">Stopping it and opening it again…</string>
+    <string name="restart_done">Restarted</string>
+    <string name="restart_failed">That didn\'t work</string>
+    <string name="restart_slow">Still working. Activity will show the result.</string>
+
+    <!-- App picker -->
+    <string name="crumb_add">Refresher › Add an app</string>
+    <string name="pick_title">Which app should it restart?</string>
+    <string name="pick_suggested">Often needs a restart</string>
+    <string name="pick_all">All apps · A–Z</string>
+    <string name="pick_show_system">Show system apps</string>
+    <string name="pick_hide_system">Hide system apps</string>
+    <string name="pick_added">Already added</string>
+    <string name="pick_loading">Finding your apps…</string>
+
+    <!-- Activity -->
+    <string name="crumb_activity">Refresher › Activity</string>
+    <string name="activity_title">Activity</string>
+    <string name="activity_today">Today</string>
+    <string name="activity_yesterday">Yesterday</string>
+    <string name="activity_restarted">%1$s restarted</string>
+    <string name="activity_skipped">%1$s skipped</string>
+    <string name="activity_failed">%1$s didn\'t work</string>
+    <string name="activity_skipped_why">screen on</string>
+    <string name="activity_empty">Nothing has run yet. Restarts will show here.</string>
+    <string name="activity_clear">Clear</string>
+    <string name="detail_title">%1$s · %2$s</string>
+    <string name="detail_skipped">Skipped because the screen was on</string>
+
+    <!-- Setup -->
+    <string name="crumb_setup">Refresher › Setup</string>
+    <string name="setup_title">What Refresher needs</string>
+    <string name="auto_setup">Set up automatically</string>
+    <string name="auto_setup_running">Setting up… If the TV asks to allow network debugging, tick Always allow and choose Allow.</string>
+    <string name="auto_setup_done">Setup finished.</string>
+    <string name="auto_setup_failed">Setup didn\'t finish. The steps below say where it stopped.</string>
+    <string name="check_shizuku">Shizuku is running</string>
+    <string name="check_shizuku_desc">Lets Refresher stop apps without root</string>
+    <string name="check_shizuku_missing">Shizuku isn\'t installed</string>
+    <string name="check_shizuku_stopped">Shizuku isn\'t running</string>
+    <string name="check_shizuku_permission">Shizuku hasn\'t allowed Refresher yet</string>
+    <string name="check_other_method">Stops apps with %1$s</string>
+    <string name="check_auto_start">Start Shizuku after a reboot</string>
+    <string name="check_auto_start_off_desc">Off: after a reboot, restarts wait until Shizuku is started</string>
+    <string name="check_auto_start_desc">About two minutes after the TV turns on</string>
+    <string name="check_exact">Exact timing</string>
+    <string name="check_exact_bad">Exact timing is off</string>
+    <string name="check_exact_desc">Lets restarts fire on time while the TV is idle</string>
+    <string name="check_battery">Battery saving is off for Refresher</string>
+    <string name="check_battery_bad">Battery saving can stop Refresher</string>
+    <string name="check_battery_desc">So the system doesn\'t put it to sleep</string>
+    <string name="check_background">Can open apps from the background</string>
+    <string name="check_background_bad">Can\'t open apps from the background</string>
+    <string name="check_background_desc">Needed to open an app again after stopping it</string>
+    <string name="check_fix">Fix</string>
+    <string name="check_get">Get Shizuku</string>
+    <string name="check_allow">Allow</string>
+    <string name="check_start">Start</string>
+    <string name="setup_pause_all">Pause all restarts</string>
+    <string name="setup_pause_all_desc">Keeps your apps and settings; nothing restarts until you turn this off</string>
+    <string name="setup_manual">Manual setup from a computer</string>
+    <string name="setting_unavailable">This TV has no screen for that setting. Use the commands under Manual setup.</string>
+    <string name="shizuku_store_unavailable">No app store on this TV could open Shizuku. Download it from %1$s</string>
+    <string name="grant_shizuku_sent">Accept the request on screen to finish.</string>
 
     <string name="refresh_now">Refresh now</string>
     <string name="refresh_now_started">Refreshing %1$s</string>
-    <string name="refresh_now_none">No enabled rules to refresh. Open Refresher to add one.</string>
+    <string name="refresh_now_none">No apps to refresh. Open Refresher to add one.</string>
 
-    <string name="next_run">Next run: %1$s</string>
-    <string name="next_run_paused">Paused</string>
-    <string name="next_run_waiting">Due · runs once the TV sleeps</string>
-    <string name="next_run_progress">%1$d%% of the way to the next run</string>
-    <string name="last_run">Last: %1$s</string>
-    <string name="never_run">Not run yet</string>
-    <string name="every_interval">Every %1$s</string>
-
-    <string name="setup_title">Setup &amp; permissions</string>
-    <string name="kill_backends_header">Kill methods</string>
-    <string name="active_backend">Active method: %1$s</string>
-    <string name="backend_available">Available</string>
-    <string name="backend_force_stop">full force-stop</string>
-    <string name="backend_partial">background processes only</string>
-    <string name="grant_shizuku">Grant Shizuku permission</string>
-    <string name="permissions_header">System permissions</string>
-    <string name="exact_alarms">Exact alarms</string>
-    <string name="exact_alarms_desc">Required for the timer to fire on schedule while the TV is idle.</string>
-    <string name="battery_exemption">Ignore battery optimisation</string>
-    <string name="battery_exemption_desc">Stops the system from parking Refresher in a standby bucket.</string>
-    <string name="overlay_permission">Display over other apps</string>
-    <string name="overlay_permission_desc">Grants the exemption that lets a relaunch start from the background.</string>
-    <string name="granted">Granted</string>
-    <string name="not_granted">Not granted</string>
-    <string name="fix">Fix</string>
-    <string name="setting_unavailable">This TV has no screen for that setting — use the ADB command below.</string>
-
-    <string name="shizuku_header">Shizuku</string>
-    <string name="get_shizuku">Get Shizuku</string>
-    <string name="update_shizuku">Update Shizuku</string>
-    <string name="auto_setup">Set up automatically</string>
-    <string name="auto_setup_desc">Connects to this TV\'s own network debugging, starts Shizuku and applies the settings the TV has no screen for. The first time, the TV asks \"Allow network debugging?\": tick Always allow, then Allow.</string>
-    <string name="auto_setup_running">Setting up… If the TV asks to allow network debugging, tick Always allow and choose Allow.</string>
-    <string name="auto_setup_done">Setup finished.</string>
-    <string name="auto_setup_failed">Setup did not finish. See the steps below.</string>
-    <string name="auto_start_shizuku">Start Shizuku automatically after a reboot</string>
-    <string name="shizuku_status_missing">Shizuku is not installed.</string>
-    <string name="shizuku_status_stopped">Shizuku is installed but not running.</string>
-    <string name="shizuku_status_no_permission">Shizuku is running; Refresher still needs its permission.</string>
-    <string name="shizuku_status_ready">Shizuku is running and Refresher has its permission.</string>
-    <string name="shizuku_store_unavailable">No app store on this TV could open Shizuku. Download it from %1$s</string>
-
-    <string name="adb_header">Manual setup from a computer</string>
-    <string name="adb_body">Only needed if \"Set up automatically\" cannot connect.\n\nConnect with <b>adb connect &lt;tv-ip&gt;:5555</b>, then run whichever block matches how you want the kill to work.\n\n<b>Shizuku (recommended, no root)</b>\nInstall Shizuku on the TV, then after each reboot run:\n  adb shell \'$(dirname $(pm path moe.shizuku.privileged.api | cut -d: -f2))/lib/arm64/libshizuku.so\'\nOpen Refresher and choose \"Grant Shizuku permission\".\n\n<b>Device owner (survives reboots, no root)</b>\nOn a box with no accounts added:\n  adb shell dpm set-device-owner com.thefactor1.taskskiller/.kill.AdminReceiver\nEach refresh briefly hides the app, which Android treats as removing and re-adding it: its tile may move on the home screen, and apps that depend on it restart too.\n\n<b>Permissions that have no TV settings screen</b>\n  adb shell appops set com.thefactor1.taskskiller SYSTEM_ALERT_WINDOW allow\n  adb shell dumpsys deviceidle whitelist +com.thefactor1.taskskiller\n\n<b>Root</b>\nNothing to do — grant Refresher root when your superuser app asks.</string>
-
-    <string name="warning_no_backend">Nothing can stop other apps yet: Android 14 and newer only let an app stop its own processes. Set up Shizuku, device owner or root in Setup.</string>
-    <string name="warning_weak_backend">Only background-process killing is available. Apps with a foreground service — most VPNs — will survive it. Set up Shizuku, device owner or root for a real force-stop.</string>
-    <string name="warning_background_launch">\"Display over other apps\" is not granted and no privileged method is active, so relaunches may be silently dropped by the system.</string>
+    <string name="adb_body">Only needed if \"Set up automatically\" can\'t connect.\n\nConnect with <b>adb connect &lt;tv-ip&gt;:5555</b>, then run whichever block matches how you want apps stopped.\n\n<b>Shizuku (recommended, no root)</b>\nInstall Shizuku on the TV, then after each reboot run:\n  adb shell \'$(dirname $(pm path moe.shizuku.privileged.api | cut -d: -f2))/lib/arm64/libshizuku.so\'\nOpen Refresher and choose Allow when Shizuku asks.\n\n<b>Device owner (survives reboots, no root)</b>\nOn a box with no accounts added:\n  adb shell dpm set-device-owner com.thefactor1.taskskiller/.kill.AdminReceiver\nEach refresh briefly hides the app, which Android treats as removing and re-adding it: its tile may move on the home screen, and apps that depend on it restart too.\n\n<b>Permissions that have no TV settings screen</b>\n  adb shell appops set com.thefactor1.taskskiller SYSTEM_ALERT_WINDOW allow\n  adb shell dumpsys deviceidle whitelist +com.thefactor1.taskskiller\n\n<b>Root</b>\nNothing to do: grant Refresher root when your superuser app asks.</string>
 </resources>

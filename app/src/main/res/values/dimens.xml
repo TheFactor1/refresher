@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Screen gutters: inside the TV's 5% overscan-safe area (48dp of 960dp). -->
+    <dimen name="gutter_h">56dp</dimen>
+    <dimen name="gutter_top">36dp</dimen>
+    <dimen name="gutter_bottom">32dp</dimen>
+
+    <!-- The one spacing scale every screen uses. -->
+    <dimen name="space_xs">4dp</dimen>
+    <dimen name="space_s">8dp</dimen>
+    <dimen name="space_m">12dp</dimen>
+    <dimen name="space_l">18dp</dimen>
+    <dimen name="space_xl">24dp</dimen>
+
+    <dimen name="radius_card">12dp</dimen>
+    <dimen name="radius_row">10dp</dimen>
+    <dimen name="focus_ring">3dp</dimen>
+
+    <dimen name="card_width">232dp</dimen>
+    <dimen name="row_pad_h">18dp</dimen>
+    <dimen name="row_pad_v">12dp</dimen>
+    <dimen name="side_column">252dp</dimen>
+</resources>

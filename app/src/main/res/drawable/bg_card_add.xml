@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:enterFadeDuration="120" android:exitFadeDuration="120">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/radius_card" />
+            <solid android:color="@color/surface_raised" />
+            <stroke android:width="@dimen/focus_ring" android:color="@color/focus" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/radius_card" />
+            <solid android:color="@android:color/transparent" />
+            <stroke android:width="2dp" android:color="@color/hairline" android:dashWidth="8dp" android:dashGap="6dp" />
+        </shape>
+    </item>
+</selector>

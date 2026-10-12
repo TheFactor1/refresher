@@ -1,43 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Window: a deep blue gradient rather than a flat fill. -->
-    <color name="background">#FF0B1020</color>
-    <color name="background_top">#FF17223C</color>
-    <color name="background_bottom">#FF070A12</color>
-    <color name="background_light">#2E5B8CE8</color>
-
-    <!-- Cards: a gentle top-to-bottom gradient reads as depth on a TV. -->
-    <color name="surface_top">#FF1E2A40</color>
-    <color name="surface_bottom">#FF141B2A</color>
-    <color name="surface_focused">#FF26365A</color>
-    <color name="surface_focused_top">#FF2C3F66</color>
-    <color name="surface_focused_bottom">#FF1F2C49</color>
-    <color name="surface_inset">#FF0E1422</color>
-    <color name="surface_glass">#1CFFFFFF</color>
-    <color name="hairline">#1FFFFFFF</color>
+    <!-- One flat, cool-neutral palette (the "Status first" design). Focus is
+         always white: a focused row or button turns white with dark text, a
+         focused card gets a white ring. -->
+    <color name="background">#FF14171C</color>
+    <color name="surface">#FF20242B</color>
+    <color name="surface_raised">#FF2A2F37</color>
+    <color name="hairline">#FF323843</color>
     <color name="hairline_strong">#40FFFFFF</color>
 
-    <!-- Accent, and the two rings of the focus glow. -->
-    <color name="accent">#FF7FB2FF</color>
-    <color name="accent_bright">#FFB0D0FF</color>
-    <color name="accent_deep">#FF4A7ADF</color>
-    <color name="accent_border_soft">#667FB2FF</color>
-    <color name="glow_outer">#387FB2FF</color>
-    <color name="glow_inner">#8C7FB2FF</color>
-    <color name="glow_white_outer">#33FFFFFF</color>
-    <color name="glow_white_inner">#80FFFFFF</color>
-    <color name="log_row_focused">#247FB2FF</color>
+    <color name="text_primary">#FFECEFF3</color>
+    <color name="text_secondary">#FFAEB5C0</color>
+    <color name="text_tertiary">#FF7D8592</color>
+    <color name="text_on_focus">#FF14171C</color>
+    <color name="text_on_focus_secondary">#FF4A5260</color>
+    <color name="focus">#FFFFFFFF</color>
 
-    <color name="text_primary">#FFF2F5FA</color>
-    <color name="text_secondary">#FFA8B3C7</color>
-    <color name="text_on_accent">#FF0A1428</color>
-
-    <color name="ok">#FF6FD48A</color>
-    <color name="warn">#FFF0B457</color>
-    <color name="bad">#FFFF8A80</color>
+    <!-- Status: each colour pairs with a dark tint for the badge behind it. -->
+    <color name="ok">#FF7FD49A</color>
+    <color name="ok_deep">#FF2F9E5B</color>
+    <color name="ok_tint">#FF1D3326</color>
+    <color name="warn">#FFF2B866</color>
+    <color name="warn_tint">#FF3A2C18</color>
+    <color name="bad">#FFF2837A</color>
     <color name="bad_deep">#FFC4483F</color>
-    <color name="bad_soft">#33FF8A80</color>
-    <color name="bad_border">#66FF8A80</color>
-    <color name="glow_bad_outer">#38FF8A80</color>
-    <color name="glow_bad_inner">#8CFF8A80</color>
+    <color name="bad_tint">#FF3D1F1D</color>
+    <color name="idle">#FF7D8592</color>
+    <color name="idle_tint">#FF262A31</color>
 </resources>

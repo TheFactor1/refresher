@@ -99,6 +99,12 @@ class RuleStore private constructor(private val prefs: SharedPreferences) {
         @Volatile
         private var instance: RuleStore? = null
 
+        /** Tests get a fresh app (and fresh storage) each time; drop the old one's store. */
+        @androidx.annotation.VisibleForTesting
+        fun resetForTests() {
+            instance = null
+        }
+
         fun get(context: Context): RuleStore = instance ?: synchronized(this) {
             instance ?: RuleStore(
                 context.applicationContext

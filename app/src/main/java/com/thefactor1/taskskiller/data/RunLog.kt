@@ -61,6 +61,12 @@ class RunLog private constructor(private val prefs: SharedPreferences) {
         @Volatile
         private var instance: RunLog? = null
 
+        /** Tests get a fresh app (and fresh storage) each time; drop the old one's store. */
+        @androidx.annotation.VisibleForTesting
+        fun resetForTests() {
+            instance = null
+        }
+
         fun get(context: Context): RunLog = instance ?: synchronized(this) {
             instance ?: RunLog(
                 context.applicationContext

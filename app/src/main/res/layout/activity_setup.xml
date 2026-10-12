@@ -1,230 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.thefactor1.taskskiller.ui.FocusScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Screen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fadingEdgeLength="48dp"
-    android:fillViewport="true"
-    android:overScrollMode="never"
-    android:requiresFadingEdge="vertical"
-    android:scrollbars="none">
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:orientation="vertical"
-        android:paddingStart="48dp"
-        android:paddingTop="32dp"
-        android:paddingEnd="48dp"
-        android:paddingBottom="48dp">
+        android:gravity="bottom"
+        android:orientation="horizontal">
 
-        <TextView
-            style="@style/ScreenTitle"
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/Text.Crumb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/crumb_setup" />
+
+            <TextView
+                style="@style/Text.Title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xs"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="@string/setup_title"
+                android:accessibilityHeading="true" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/autoSetupButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:text="@string/setup_title" />
+            android:layout_marginStart="@dimen/space_xl"
+            android:text="@string/auto_setup" />
+    </LinearLayout>
 
-        <TextView
-            android:id="@+id/activeBackendText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="6dp"
-            android:fontFamily="sans-serif-medium"
-            android:textColor="@color/accent_bright"
-            android:textSize="16sp" />
+    <com.thefactor1.taskskiller.ui.FocusScrollView
+        android:id="@+id/setupScroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/space_l"
+        android:layout_weight="1"
+        android:overScrollMode="never"
+        android:scrollbars="none">
 
-        <!-- Shizuku first: it is the recommended method and can be set up from
-             the TV itself, so it gets the prominent buttons. -->
         <LinearLayout
-            style="@style/Card.Group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp">
+            android:divider="@drawable/space_s"
+            android:orientation="vertical"
+            android:showDividers="middle">
 
             <TextView
-                style="@style/SectionHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:text="@string/shizuku_header" />
-
-            <TextView
-                android:id="@+id/shizukuStatusText"
+                android:id="@+id/setupResult"
+                style="@style/Text.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
+                android:background="@drawable/bg_panel"
+                android:padding="@dimen/row_pad_h"
                 android:textColor="@color/text_primary"
-                android:textSize="15sp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:clipChildren="false"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/autoSetupButton"
-                    style="@style/Widget.TasksKiller.Button.Primary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/auto_setup" />
-
-                <Button
-                    android:id="@+id/getShizukuButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="@string/get_shizuku" />
-
-            </LinearLayout>
-
-            <!-- Own line: with three buttons in one row the last one ran past the
-                 card's edge on larger system font sizes. Only shown when needed. -->
-            <Button
-                android:id="@+id/shizukuButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="@string/grant_shizuku" />
-
-            <TextView
-                style="@style/Body"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="4dp"
-                android:text="@string/auto_setup_desc" />
-
-            <TextView
-                android:id="@+id/autoSetupResultText"
-                style="@style/Mono"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginEnd="4dp"
-                android:background="@drawable/bg_inset_box"
-                android:padding="14dp"
                 android:visibility="gone" />
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/autoStartShizukuSwitch"
+            <include android:id="@+id/shizukuRow" layout="@layout/row_check" />
+            <include android:id="@+id/autoStartRow" layout="@layout/row_check" />
+            <include android:id="@+id/exactRow" layout="@layout/row_check" />
+            <include android:id="@+id/batteryRow" layout="@layout/row_check" />
+            <include android:id="@+id/backgroundRow" layout="@layout/row_check" />
+
+            <include
+                android:id="@+id/pauseAllRow"
+                layout="@layout/row_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="@string/auto_start_shizuku" />
+                android:layout_marginTop="@dimen/space_l" />
+
+            <LinearLayout
+                android:id="@+id/manualCard"
+                style="@style/Row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_l"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/Text.RowTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/setup_manual" />
+
+                <TextView
+                    android:id="@+id/manualText"
+                    style="@style/Text.RowSub"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_s"
+                    android:fontFamily="monospace"
+                    android:lineSpacingMultiplier="1.3"
+                    android:textSize="13sp" />
+            </LinearLayout>
         </LinearLayout>
-
-        <!-- Nothing to press here, so the card itself takes focus. -->
-        <LinearLayout
-            style="@style/Card.Focusable"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp">
-
-            <TextView
-                style="@style/SectionHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/kill_backends_header" />
-
-            <TextView
-                android:id="@+id/backendListText"
-                style="@style/Body"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <!-- Takes focus itself only when every permission is granted and its
-             Fix buttons are hidden; see SetupActivity.refresh(). -->
-        <LinearLayout
-            android:id="@+id/permissionsCard"
-            style="@style/Card.Group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp">
-
-            <TextView
-                style="@style/SectionHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:text="@string/permissions_header" />
-
-            <TextView
-                android:id="@+id/exactAlarmText"
-                style="@style/Body"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp" />
-
-            <Button
-                android:id="@+id/exactAlarmButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="@string/fix" />
-
-            <TextView
-                android:id="@+id/batteryText"
-                style="@style/Body"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="14dp"
-                android:layout_marginEnd="4dp" />
-
-            <Button
-                android:id="@+id/batteryButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="@string/fix" />
-
-            <TextView
-                android:id="@+id/overlayText"
-                style="@style/Body"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="14dp"
-                android:layout_marginEnd="4dp" />
-
-            <Button
-                android:id="@+id/overlayButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="@string/fix" />
-        </LinearLayout>
-
-        <!-- Reference text. Deliberately not selectable: a selectable TextView
-             swallows the D-pad's up/down, which is what froze scrolling here. -->
-        <LinearLayout
-            style="@style/Card.Focusable"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp">
-
-            <TextView
-                style="@style/SectionHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/adb_header" />
-
-            <TextView
-                android:id="@+id/adbText"
-                style="@style/Mono"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/adb_body" />
-        </LinearLayout>
-    </LinearLayout>
-</com.thefactor1.taskskiller.ui.FocusScrollView>
+    </com.thefactor1.taskskiller.ui.FocusScrollView>
+</LinearLayout>

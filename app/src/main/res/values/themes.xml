@@ -1,148 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.TasksKiller" parent="Theme.MaterialComponents.NoActionBar">
-        <item name="colorPrimary">@color/accent</item>
-        <item name="colorSecondary">@color/accent</item>
-        <item name="colorControlActivated">@color/accent</item>
+        <item name="colorPrimary">@color/ok</item>
+        <item name="colorSecondary">@color/ok</item>
+        <item name="colorControlActivated">@color/ok</item>
         <item name="colorControlNormal">@color/text_secondary</item>
         <item name="android:colorBackground">@color/background</item>
-        <!-- The gradient lives on the window so every screen shares it and the
-             layouts themselves stay transparent. -->
-        <item name="android:windowBackground">@drawable/bg_window</item>
+        <item name="android:windowBackground">@color/background</item>
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
-        <item name="materialButtonStyle">@style/Widget.TasksKiller.Button</item>
-        <item name="switchStyle">@style/Widget.TasksKiller.SwitchRow</item>
-        <item name="seekBarStyle">@style/Widget.TasksKiller.SeekBar</item>
-        <item name="android:seekBarStyle">@style/Widget.TasksKiller.SeekBar</item>
+        <item name="materialButtonStyle">@style/Widget.Refresher.Button</item>
     </style>
 
-    <!-- Buttons: pills with a glow ring when focused. The ring is drawn inside
-         the view's bounds, so every background reserves a 4dp margin for it
-         and the button body sits inset by that much. They do not grow on
-         focus: scaling pushed a selected pill past the line its neighbours
-         and the card text sit on, so only the ring marks the selection. -->
-    <style name="Widget.TasksKiller.Button" parent="Widget.MaterialComponents.Button.UnelevatedButton">
-        <item name="android:background">@drawable/bg_button_secondary</item>
-        <item name="backgroundTint">@null</item>
-        <item name="rippleColor">@android:color/transparent</item>
+    <!-- Screen frame: the same gutters on every screen. -->
+    <style name="Screen">
+        <item name="android:paddingStart">@dimen/gutter_h</item>
+        <item name="android:paddingEnd">@dimen/gutter_h</item>
+        <item name="android:paddingTop">@dimen/gutter_top</item>
+        <item name="android:paddingBottom">@dimen/gutter_bottom</item>
+    </style>
+
+    <!-- Type scale: 38 / 32 / 17 / 16 / 14 / 13 -->
+    <style name="Text" />
+    <style name="Text.Hero">
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textAllCaps">false</item>
-        <item name="android:textSize">15sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:letterSpacing">0.01</item>
-        <item name="android:minHeight">56dp</item>
-        <item name="android:minWidth">0dp</item>
-        <item name="android:insetTop">0dp</item>
-        <item name="android:insetBottom">0dp</item>
-        <item name="android:paddingStart">28dp</item>
-        <item name="android:paddingEnd">28dp</item>
-        <item name="android:stateListAnimator">@null</item>
-    </style>
-
-    <style name="Widget.TasksKiller.Button.Primary">
-        <item name="android:background">@drawable/bg_button_primary</item>
-        <item name="android:textColor">@color/text_on_accent</item>
-    </style>
-
-    <style name="Widget.TasksKiller.Button.Danger">
-        <item name="android:background">@drawable/bg_button_danger</item>
-    </style>
-
-    <style name="Widget.TasksKiller.Button.Small">
-        <item name="android:minHeight">46dp</item>
-        <item name="android:textSize">13sp</item>
-        <item name="android:paddingStart">20dp</item>
-        <item name="android:paddingEnd">20dp</item>
-    </style>
-
-    <!-- Switches are whole rows, so the glow wraps the label too. Full-width
-         rows and cards glow but do not grow: scaling pushed them out of line
-         with their neighbours and into the card margin. -->
-    <style name="Widget.TasksKiller.SwitchRow" parent="Widget.AppCompat.CompoundButton.Switch">
-        <item name="android:background">@drawable/focusable_item</item>
-        <item name="android:paddingStart">22dp</item>
-        <item name="android:paddingEnd">20dp</item>
-        <item name="android:paddingTop">14dp</item>
-        <item name="android:paddingBottom">14dp</item>
-        <item name="android:minHeight">60dp</item>
-        <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textSize">15sp</item>
-        <item name="switchPadding">16dp</item>
-        <item name="android:focusable">true</item>
-    </style>
-
-    <style name="Widget.TasksKiller.SeekBar" parent="Widget.AppCompat.SeekBar">
-        <item name="android:background">@drawable/focusable_item</item>
-        <item name="android:paddingStart">28dp</item>
-        <item name="android:paddingEnd">28dp</item>
-        <item name="android:paddingTop">20dp</item>
-        <item name="android:paddingBottom">20dp</item>
-        <item name="android:progressTint">@color/accent</item>
-        <item name="android:progressBackgroundTint">@color/hairline_strong</item>
-        <item name="android:thumbTint">@color/accent_bright</item>
-        <item name="android:splitTrack">false</item>
-        <item name="android:focusable">true</item>
-    </style>
-
-    <!-- Type -->
-    <style name="ScreenTitle">
-        <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textSize">28sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">38sp</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">-0.01</item>
     </style>
 
-    <style name="SectionHeader">
-        <item name="android:textColor">@color/accent</item>
-        <item name="android:textSize">12sp</item>
+    <style name="Text.Title">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">-0.01</item>
+    </style>
+
+    <style name="Text.Crumb">
+        <item name="android:textColor">@color/text_tertiary</item>
+        <item name="android:textSize">13sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textAllCaps">true</item>
-        <item name="android:letterSpacing">0.14</item>
-        <item name="android:paddingTop">2dp</item>
-        <item name="android:paddingBottom">10dp</item>
     </style>
 
-    <style name="Body">
+    <style name="Text.Sub">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:lineSpacingMultiplier">1.15</item>
+    </style>
+
+    <style name="Text.Label">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="Text.Body">
         <item name="android:textColor">@color/text_secondary</item>
         <item name="android:textSize">14sp</item>
         <item name="android:lineSpacingMultiplier">1.25</item>
     </style>
 
-    <style name="Mono" parent="Body">
-        <item name="android:fontFamily">monospace</item>
-        <item name="android:textSize">13sp</item>
+    <style name="Text.RowTitle">
+        <item name="android:textColor">@color/row_text_primary</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:duplicateParentState">true</item>
     </style>
 
-    <!-- Cards. The 24dp padding includes the 4dp reserved for the focus ring.
-         Text directly inside a card that also holds controls takes a further
-         4dp start/end margin, so it lines up with the pills and rows, whose
-         bodies sit 4dp inside their own bounds. -->
-    <style name="Card">
-        <item name="android:background">@drawable/bg_card</item>
-        <item name="android:orientation">vertical</item>
+    <style name="Text.RowSub">
+        <item name="android:textColor">@color/row_text_secondary</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:duplicateParentState">true</item>
+    </style>
+
+    <!-- A focusable row: white with dark text when focused. -->
+    <style name="Row">
+        <item name="android:background">@drawable/bg_row</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+        <item name="android:paddingStart">@dimen/row_pad_h</item>
+        <item name="android:paddingEnd">@dimen/row_pad_h</item>
+        <item name="android:paddingTop">@dimen/row_pad_v</item>
+        <item name="android:paddingBottom">@dimen/row_pad_v</item>
+        <item name="android:minHeight">56dp</item>
+    </style>
+
+    <!-- Buttons: pills that turn white when focused. -->
+    <style name="Widget.Refresher.Button" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:background">@drawable/bg_button</item>
+        <item name="backgroundTint">@null</item>
+        <item name="rippleColor">@android:color/transparent</item>
+        <item name="android:textColor">@color/button_text</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
         <item name="android:paddingStart">24dp</item>
         <item name="android:paddingEnd">24dp</item>
-        <item name="android:paddingTop">22dp</item>
-        <item name="android:paddingBottom">22dp</item>
-        <item name="android:clipChildren">false</item>
+        <item name="android:stateListAnimator">@null</item>
     </style>
 
-    <!-- A card whose controls take focus: its border brightens while any of
-         them is focused, so the box being worked in stays obvious. -->
-    <style name="Card.Group">
-        <item name="android:background">@drawable/bg_card_group</item>
-        <item name="android:addStatesFromChildren">true</item>
+    <style name="Widget.Refresher.Button.Danger">
+        <item name="android:background">@drawable/bg_button_danger</item>
+        <item name="android:textColor">@color/button_danger_text</item>
     </style>
 
-    <!-- A card with nothing to press: the card itself takes focus, so the
-         D-pad can stop on it instead of jumping past. -->
-    <style name="Card.Focusable">
-        <item name="android:background">@drawable/focusable_item</item>
-        <item name="android:focusable">true</item>
-        <!-- Text only, so it takes the extra 4dp itself to line up with the
-             text of the neighbouring cards that hold controls. -->
-        <item name="android:paddingStart">28dp</item>
-        <item name="android:paddingEnd">28dp</item>
+    <style name="Widget.Refresher.Button.Small">
+        <item name="android:minHeight">40dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:paddingStart">18dp</item>
+        <item name="android:paddingEnd">18dp</item>
     </style>
 </resources>

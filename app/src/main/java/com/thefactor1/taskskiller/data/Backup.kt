@@ -27,7 +27,7 @@ object Backup {
     )
 
     private const val TAG = "Backup"
-    private const val DIR = "/data/local/tmp/refresher"
+    const val DIR = "/data/local/tmp/refresher"
     private const val FILE = "$DIR/backup.json"
     private const val FORMAT = 1
 
@@ -82,7 +82,7 @@ object Backup {
         val store = RuleStore.get(context)
         val rules = store.all()
         // A fresh install has nothing yet: never overwrite a good backup with that.
-        if (rules.isEmpty()) return
+        if (rules.isEmpty() || !store.backupEnabled) return
         val backend = KillBackends.resolve(context)
         val data = encode(Contents(rules, store.masterEnabled, store.autoStartShizuku, System.currentTimeMillis()))
         val b64 = Base64.encodeToString(data.toByteArray(), Base64.NO_WRAP)

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.SystemClock
+import com.thefactor1.taskskiller.data.Backup
 import com.thefactor1.taskskiller.kill.ShizukuBackend
 
 /**
@@ -66,6 +67,23 @@ object ShizukuStarter {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 add("Let Refresher show its notification" to "pm grant $pkg android.permission.POST_NOTIFICATIONS")
             }
+        }
+    }
+
+    /**
+     * What "Remove setup" undoes, each with its plain words: the opposite of
+     * [settingsSteps], plus the backup kept outside the app (which is made to
+     * survive an uninstall, so it has to be deleted on purpose).
+     */
+    fun undoSteps(context: Context): List<Pair<String, String>> {
+        val pkg = context.packageName
+        return buildList {
+            add("Stop letting Refresher reopen apps from the background" to "appops set $pkg SYSTEM_ALERT_WINDOW default")
+            add("Let battery saving treat Refresher like any other app" to "dumpsys deviceidle whitelist -$pkg")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                add("Stop exact timing" to "appops set $pkg SCHEDULE_EXACT_ALARM default")
+            }
+            add("Delete the backup of your apps" to "rm -rf ${Backup.DIR}")
         }
     }
 

@@ -8,13 +8,16 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import com.thefactor1.taskskiller.R
+import com.thefactor1.taskskiller.data.Backup
 import com.thefactor1.taskskiller.data.RuleStore
 import com.thefactor1.taskskiller.databinding.ActivitySetupBinding
 import com.thefactor1.taskskiller.databinding.RowCheckBinding
+import com.thefactor1.taskskiller.kill.KillBackends
 import com.thefactor1.taskskiller.kill.ShizukuBackend
 import com.thefactor1.taskskiller.schedule.RestartScheduler
 import com.thefactor1.taskskiller.setup.ShizukuStarter
@@ -45,6 +48,12 @@ class SetupActivity : AppCompatActivity() {
         binding.whatsNewRow.checkAction.setText(R.string.whats_new_open)
         binding.whatsNewRow.checkAction.visibility = View.VISIBLE
         binding.whatsNewRow.root.setOnClickListener { WhatsNew.show(this) }
+        binding.removeRow.rowTitle.setText(R.string.remove_row)
+        binding.removeRow.rowHint.setText(R.string.remove_row_hint)
+        binding.removeRow.checkIcon.visibility = View.GONE
+        binding.removeRow.checkAction.setText(R.string.remove_action)
+        binding.removeRow.checkAction.visibility = View.VISIBLE
+        binding.removeRow.root.setOnClickListener { confirmRemove() }
         binding.pauseAllRow.rowTitle.setText(R.string.setup_pause_all)
         binding.pauseAllRow.rowHint.setText(R.string.setup_pause_all_desc)
         binding.pauseAllRow.root.setOnClickListener {
@@ -167,6 +176,11 @@ class SetupActivity : AppCompatActivity() {
                 // that's the point to start Shizuku automatically from now on.
                 val autoStart = connected && ShizukuStarter.isInstalled(this)
                 if (autoStart) RuleStore.get(this).autoStartShizuku = true
+                // Setup again after "Remove setup": the backup comes back too.
+                if (connected && !RuleStore.get(this).backupEnabled) {
+                    RuleStore.get(this).backupEnabled = true
+                    Backup.saveAsync(this)
+                }
                 val lines = (steps.map { step ->
                     val detail = if (step.detail.isBlank()) "" else ": ${step.detail}"
                     "${if (step.ok) "✓" else "✗"}  ${step.label}$detail"
@@ -210,6 +224,74 @@ class SetupActivity : AppCompatActivity() {
             }
         }
         binding.autoDetails.text = HtmlCompat.fromHtml(html.removeSuffix("<br>"), HtmlCompat.FROM_HTML_MODE_LEGACY)
+    }
+
+    /** Says exactly what will be undone and what is left to do by hand, before anything happens. */
+    private fun confirmRemove() {
+        if (busy) return
+        val undo = listOf(getString(R.string.remove_pause), getString(R.string.remove_autostart)) +
+            ShizukuStarter.undoSteps(this).map { it.first }
+        val left = listOf(R.string.remove_left_uninstall, R.string.remove_left_shizuku, R.string.remove_left_debugging).map(::getString)
+        val message = getString(R.string.remove_will) + "\n" + undo.joinToString("\n") { "•  $it" } +
+            "\n\n" + getString(R.string.remove_yourself) + "\n" + left.joinToString("\n") { "•  $it" }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.remove_title)
+            .setMessage(message)
+            .setPositiveButton(R.string.remove_confirm) { _, _ -> runRemove() }
+            .setNegativeButton(R.string.remove_cancel, null)
+            .show()
+    }
+
+    /**
+     * Undoes automatic setup. The app's own switches go first (so no restart,
+     * auto-start or backup runs while the rest is undone), then the system
+     * settings and the backup through Shizuku's shell. Each line is reported.
+     */
+    private fun runRemove() {
+        busy = true
+        worker.execute {
+            val store = RuleStore.get(applicationContext)
+            store.backupEnabled = false
+            store.masterEnabled = false
+            store.autoStartShizuku = false
+            RestartScheduler.scheduleAll(applicationContext) // cancels alarms, stops the wake watcher
+            val lines = mutableListOf("✓  " + getString(R.string.remove_pause), "✓  " + getString(R.string.remove_autostart))
+            var allOk = true
+            val backend = KillBackends.resolve(applicationContext)
+            ShizukuStarter.undoSteps(applicationContext).forEach { (label, command) ->
+                val result = backend.shell(applicationContext, arrayOf("sh", "-c", command))
+                when {
+                    result == null -> {
+                        allOk = false
+                        val why = if (command.startsWith("rm ")) R.string.remove_backup_needs_shizuku else R.string.remove_needs_shizuku
+                        lines += "✗  $label: ${getString(why)}"
+                    }
+                    result.success -> lines += "✓  $label"
+                    else -> { allOk = false; lines += "✗  $label: ${result.detail}" }
+                }
+            }
+            runOnUiThread {
+                if (isFinishing || isDestroyed) return@runOnUiThread
+                busy = false
+                refresh()
+                AlertDialog.Builder(this)
+                    .setTitle(if (allOk) R.string.remove_done_title else R.string.remove_partial_title)
+                    .setMessage(lines.joinToString("\n") + "\n\n" + getString(R.string.remove_yourself) + "\n" +
+                        listOf(R.string.remove_left_shizuku, R.string.remove_left_debugging).joinToString("\n") { "•  " + getString(it) })
+                    .setPositiveButton(R.string.remove_uninstall) { _, _ -> uninstallSelf() }
+                    .setNegativeButton(R.string.remove_close, null)
+                    .show()
+            }
+        }
+    }
+
+    /** The system's own uninstall dialog for Refresher; app info if this TV has none. */
+    private fun uninstallSelf() {
+        try {
+            startActivity(Intent(Intent.ACTION_DELETE, appUri()))
+        } catch (e: Exception) {
+            open(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, appUri()))
+        }
     }
 
     private fun esc(text: String): String = android.text.TextUtils.htmlEncode(text)

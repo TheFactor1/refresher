@@ -1,3 +1,6 @@
+## 0.6.4
+New in Setup: "Remove Refresher's setup". It says exactly what it will undo, undoes automatic setup, deletes the backup, then offers to uninstall Refresher. It also lists what's left for you if you want everything gone.
+
 ## 0.6.3
 Setup is simpler: one card says what to have ready, exactly what automatic setup changes, and the two questions the TV will ask. The results are in plain words.
 

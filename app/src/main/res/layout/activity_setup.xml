@@ -133,6 +133,13 @@
                 android:layout_marginTop="@dimen/space_l" />
 
             <include
+                android:id="@+id/removeRow"
+                layout="@layout/row_check"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_l" />
+
+            <include
                 android:id="@+id/whatsNewRow"
                 layout="@layout/row_check"
                 android:layout_width="match_parent"

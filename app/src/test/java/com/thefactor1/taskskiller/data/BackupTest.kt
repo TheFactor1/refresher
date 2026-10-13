@@ -72,4 +72,18 @@ class BackupTest {
         assertTrue(StepWords.isProblem("VPN didn't come back"))
         assertFalse(StepWords.isProblem("VPN back in 4.8 seconds"))
     }
+
+    @Test
+    fun removeSetupUndoesEverySettingAndDeletesTheBackup() {
+        val context = androidx.test.core.app.ApplicationProvider.getApplicationContext<android.content.Context>()
+        val set = com.thefactor1.taskskiller.setup.ShizukuStarter.settingsSteps(context).map { it.second }
+        val undo = com.thefactor1.taskskiller.setup.ShizukuStarter.undoSteps(context).map { it.second }
+        assertTrue(undo.any { it.contains("SYSTEM_ALERT_WINDOW default") })
+        assertTrue(undo.any { it.startsWith("dumpsys deviceidle whitelist -") })
+        assertTrue(undo.contains("rm -rf /data/local/tmp/refresher"))
+        // Every app-op setup allows, removal puts back to default.
+        set.filter { it.startsWith("appops set") }.forEach { cmd ->
+            assertTrue(cmd, undo.contains(cmd.replace(" allow", " default")))
+        }
+    }
 }

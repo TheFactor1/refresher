@@ -80,6 +80,15 @@ class RuleStore private constructor(private val prefs: SharedPreferences) {
         get() = prefs.getBoolean(KEY_AUTO_START_SHIZUKU, false)
         set(value) = prefs.edit().putBoolean(KEY_AUTO_START_SHIZUKU, value).apply()
 
+    /**
+     * Keep the copy of the rules outside the app (Backup). Off after "Remove
+     * setup", so nothing writes it back after it was deleted; on again with
+     * the next automatic setup.
+     */
+    var backupEnabled: Boolean
+        get() = prefs.getBoolean(KEY_BACKUP_ENABLED, true)
+        set(value) = prefs.edit().putBoolean(KEY_BACKUP_ENABLED, value).apply()
+
     @Synchronized
     private fun write(rules: List<Rule>) {
         val array = JSONArray()
@@ -93,6 +102,7 @@ class RuleStore private constructor(private val prefs: SharedPreferences) {
         private const val KEY_MASTER = "master_enabled"
         private const val KEY_BACKEND = "preferred_backend"
         private const val KEY_AUTO_START_SHIZUKU = "auto_start_shizuku"
+        private const val KEY_BACKUP_ENABLED = "backup_enabled"
 
         const val BACKEND_AUTO = "auto"
 

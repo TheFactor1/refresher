@@ -1,3 +1,6 @@
+## 0.6.6
+New in Setup: Privacy. It says plainly what Refresher can see and do (nothing leaves the TV). The boot receiver is also no longer reachable by other apps.
+
 ## 0.6.5
 An app's page now says that changes save as you make them, and shows "✓ Saved" after each one. There's no Save button to press.
 

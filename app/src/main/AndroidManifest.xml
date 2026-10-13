@@ -151,7 +151,7 @@
 
         <receiver
             android:name=".schedule.BootReceiver"
-            android:exported="true"
+            android:exported="false"
             android:directBootAware="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

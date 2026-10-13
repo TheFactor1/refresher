@@ -11,8 +11,8 @@ android {
         applicationId = "com.thefactor1.taskskiller"
         minSdk = 24
         targetSdk = 34
-        versionCode = 13
-        versionName = "0.6.5"
+        versionCode = 14
+        versionName = "0.6.6"
     }
 
     buildTypes {

@@ -48,6 +48,18 @@ class SetupActivity : AppCompatActivity() {
         binding.whatsNewRow.checkAction.setText(R.string.whats_new_open)
         binding.whatsNewRow.checkAction.visibility = View.VISIBLE
         binding.whatsNewRow.root.setOnClickListener { WhatsNew.show(this) }
+        binding.privacyRow.rowTitle.setText(R.string.privacy_row)
+        binding.privacyRow.rowHint.setText(R.string.privacy_row_hint)
+        binding.privacyRow.checkIcon.visibility = View.GONE
+        binding.privacyRow.checkAction.setText(R.string.whats_new_open)
+        binding.privacyRow.checkAction.visibility = View.VISIBLE
+        binding.privacyRow.root.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.privacy_title)
+                .setMessage(R.string.privacy_body)
+                .setPositiveButton(R.string.privacy_ok, null)
+                .show()
+        }
         binding.removeRow.rowTitle.setText(R.string.remove_row)
         binding.removeRow.rowHint.setText(R.string.remove_row_hint)
         binding.removeRow.checkIcon.visibility = View.GONE

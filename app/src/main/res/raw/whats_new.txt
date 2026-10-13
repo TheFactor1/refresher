@@ -1,3 +1,9 @@
+## 0.6.1
+The "Clear its cache too" option from 0.6.0 is gone: Android on this TV doesn't let one app clear another app's cache, so it couldn't work. Nothing was ever deleted.
+
+## 0.6.0
+Tried a "Clear its cache too" option (removed again in 0.6.1).
+
 ## 0.5.1
 These notes: Refresher shows what changed after each update, and any time under Setup › What's new.
 All the checks fit on the home screen at once, and Activity and Setup have their own buttons at the top right.

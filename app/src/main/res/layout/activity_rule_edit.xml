@@ -106,6 +106,7 @@
 
                     <include android:id="@+id/intervalRow" layout="@layout/row_value" />
                     <include android:id="@+id/asleepRow" layout="@layout/row_switch" />
+                    <include android:id="@+id/turnOnRow" layout="@layout/row_switch" />
                     <include android:id="@+id/reopenRow" layout="@layout/row_switch" />
                     <include android:id="@+id/delayRow" layout="@layout/row_value" />
                     <include android:id="@+id/wakeRow" layout="@layout/row_switch" />

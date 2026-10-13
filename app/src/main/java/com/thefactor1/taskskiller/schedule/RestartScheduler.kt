@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import com.thefactor1.taskskiller.data.Rule
+import com.thefactor1.taskskiller.data.Backup
 import com.thefactor1.taskskiller.data.RuleStore
 
 object RestartScheduler {
@@ -28,6 +29,8 @@ object RestartScheduler {
         // Drop alarms for rules that were disabled or deleted while we were away.
         allRules.filterNot { enabledIds.contains(it.id) }.forEach { cancel(context, it.id) }
         enabled.forEach { schedule(context, it) }
+        WakeWatch.sync(context)
+        Backup.saveAsync(context)
     }
 
     fun schedule(context: Context, rule: Rule) = scheduleAt(context, rule.id, nextRunAt(rule))

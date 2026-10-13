@@ -21,10 +21,14 @@ import com.thefactor1.taskskiller.data.RuleStore
 import com.thefactor1.taskskiller.data.RunLog
 import com.thefactor1.taskskiller.setup.ShizukuStarter
 import com.thefactor1.taskskiller.kill.ShizukuBackend
+import com.thefactor1.taskskiller.kill.KillBackend
 import com.thefactor1.taskskiller.kill.KillBackends
 import com.thefactor1.taskskiller.launch.AppLauncher
 import com.thefactor1.taskskiller.ui.MainActivity
 import com.thefactor1.taskskiller.util.ForegroundApp
+import com.thefactor1.taskskiller.kill.OpResult
+import com.thefactor1.taskskiller.util.Format
+import com.thefactor1.taskskiller.util.VpnCheck
 import com.thefactor1.taskskiller.util.PackageUtil
 import com.thefactor1.taskskiller.util.ScreenUtil
 import java.util.concurrent.Executors
@@ -154,64 +158,119 @@ class RestartService : Service() {
         val onScreenBefore = if (displayWasOff) null
             else ForegroundApp.packageName(this, backend) ?: if (manual && returnToApp) packageName else null
 
+        // For a VPN that was connected, note which VPN network is up now, so a
+        // new one afterwards proves the restart brought it back.
+        val vpnBefore = if (rule.relaunch && VpnCheck.isVpnApp(this, rule.packageName)) {
+            VpnCheck.vpnNetworks(this).takeIf { it.isNotEmpty() }
+        } else {
+            null
+        }
+
+        val vpnWatch = vpnBefore?.let { VpnCheck.watch(this, it) }
         val killResult = backend.kill(this, rule.packageName)
         val parts = mutableListOf(
             if (killResult.success) "Refreshed via ${backend.displayName}"
             else "Refresh failed (${backend.displayName}): ${killResult.detail}"
         )
         if (killResult.success && killResult.detail.isNotBlank()) parts += killResult.detail
+        var success = killResult.success
 
         if (rule.relaunch && PackageUtil.launchIntent(this, rule.packageName) == null) {
             // A kill-only app (no launcher entry): there is nothing to relaunch,
             // which is expected rather than a failure.
             parts += "not relaunched (no launcher entry)"
         } else if (rule.relaunch) {
-            SystemClock.sleep(rule.relaunchDelayMs.coerceIn(0L, MAX_RELAUNCH_DELAY_MS))
-            if (rule.wakeScreen) ScreenUtil.wakeScreen(this, backend)
-            val launchResult = AppLauncher.launch(this, backend, rule.packageName)
-            parts += if (launchResult.success) {
-                if (launchResult.detail.isBlank()) "relaunched" else "relaunched (${launchResult.detail})"
-            } else {
-                "relaunch failed: ${launchResult.detail}"
-            }
+            val launchedAt = relaunch(rule, backend, displayWasOff, onScreenBefore, parts)
 
-            // Relaunched into a sleeping TV: once the app has had time to start
-            // (a VPN reconnects meanwhile), put the launcher back on top so the
-            // TV wakes up to the home screen instead of to that app. Skipped if
-            // someone turned the TV on in the meantime.
-            if (launchResult.success && displayWasOff && !rule.wakeScreen) {
-                SystemClock.sleep(HOME_RETURN_DELAY_MS)
-                if (!ScreenUtil.isScreenOn(this)) {
-                    val home = AppLauncher.goHome(this, backend)
-                    parts += if (home.success) "returned to Home" else "could not return to Home: ${home.detail}"
-                }
-            } else if (launchResult.success && !rule.wakeScreen &&
-                onScreenBefore != null && onScreenBefore != rule.packageName
-            ) {
-                // Someone is using the TV. The relaunched app's own start-up does
-                // the reconnecting, so it only needs a moment in front before
-                // whatever they were looking at is put back.
-                SystemClock.sleep(RETURN_DELAY_MS)
-                val label = PackageUtil.label(this, onScreenBefore)
-                var back = AppLauncher.returnTo(this, backend, onScreenBefore)
-                // Some apps open a second screen of their own once they are up
-                // (NordVPN's connection screen ~0.4 s after the first return), which
-                // lands on top again. Keep watching briefly and step back in front.
-                val watchUntil = SystemClock.elapsedRealtime() + RETURN_WATCH_MS
-                var retries = 0
-                while (back.success && retries < MAX_RETURN_RETRIES && SystemClock.elapsedRealtime() < watchUntil) {
-                    SystemClock.sleep(RETURN_POLL_MS)
-                    if (ForegroundApp.packageName(this, backend) == rule.packageName) {
-                        back = AppLauncher.returnTo(this, backend, onScreenBefore)
-                        retries++
+            if (killResult.success && launchedAt != null && vpnWatch != null) {
+                val back = vpnWatch.await(launchedAt, VPN_WAIT_MS)
+                if (back != null) {
+                    parts += "VPN back in ${Format.seconds(back)}"
+                } else {
+                    // One more go: a VPN that didn't reconnect is the failure
+                    // this whole app exists to fix, so it is worth a second try.
+                    val retryWatch = VpnCheck.watch(this, VpnCheck.vpnNetworks(this))
+                    backend.kill(this, rule.packageName)
+                    val againAt = relaunch(rule, backend, !ScreenUtil.isScreenOn(this), onScreenBefore, mutableListOf())
+                    val second = if (againAt != null) retryWatch.await(againAt, VPN_WAIT_MS) else retryWatch.await(0L, 0L)
+                    if (second != null) {
+                        parts += "VPN back in ${Format.seconds(second)} after a second try"
+                    } else {
+                        parts += "VPN didn't come back"
+                        success = false
                     }
                 }
-                parts += if (back.success) "returned to $label" else "could not return to $label: ${back.detail}"
             }
         }
 
-        record(rule, parts.joinToString(" • "), killResult.success)
+        vpnWatch?.await(0L, 0L) // stops it if the check above didn't run
+        record(rule, parts.joinToString(" • "), success)
         reArm(ruleId, rule)
+    }
+
+    /**
+     * Opens the app again and settles the screen: a sleeping TV goes back to
+     * Home once the app has had time to start; with someone watching, whatever
+     * they were on comes back in front. Returns when it was opened
+     * (elapsedRealtime), or null if it couldn't be.
+     */
+    private fun relaunch(
+        rule: Rule,
+        backend: KillBackend,
+        displayWasOff: Boolean,
+        onScreenBefore: String?,
+        parts: MutableList<String>
+    ): Long? {
+        SystemClock.sleep(rule.relaunchDelayMs.coerceIn(0L, MAX_RELAUNCH_DELAY_MS))
+        if (rule.wakeScreen) ScreenUtil.wakeScreen(this, backend)
+        // Someone may have opened another app during the wait; that is the one
+        // to give back, not what was on screen before the stop.
+        val target = if (displayWasOff) null else
+            ForegroundApp.packageName(this, backend)?.takeIf { it != rule.packageName } ?: onScreenBefore
+        val launchResult = AppLauncher.launch(this, backend, rule.packageName)
+        val launchedAt = SystemClock.elapsedRealtime()
+        parts += if (launchResult.success) {
+            if (launchResult.detail.isBlank()) "relaunched" else "relaunched (${launchResult.detail})"
+        } else {
+            "relaunch failed: ${launchResult.detail}"
+        }
+        if (!launchResult.success) return null
+
+        // Relaunched into a sleeping TV: once the app has had time to start
+        // (a VPN reconnects meanwhile), put the launcher back on top so the
+        // TV wakes up to the home screen instead of to that app. Skipped if
+        // someone turned the TV on in the meantime.
+        if (displayWasOff && !rule.wakeScreen) {
+            SystemClock.sleep(HOME_RETURN_DELAY_MS)
+            if (!ScreenUtil.isScreenOn(this)) {
+                val home = AppLauncher.goHome(this, backend)
+                parts += if (home.success) "returned to Home" else "could not return to Home: ${home.detail}"
+            }
+        } else if (!rule.wakeScreen && target != null && target != rule.packageName) {
+            // Someone is using the TV. The relaunched app's own start-up does
+            // the reconnecting, so it only needs a moment in front before
+            // whatever they were looking at is put back. Only while the app is
+            // actually on top: never pull someone out of what they just opened.
+            // Some apps open a second screen of their own once they are up
+            // (NordVPN's connection screen), so keep watching briefly.
+            SystemClock.sleep(RETURN_DELAY_MS)
+            val label = PackageUtil.label(this, target)
+            var back: OpResult? = null
+            val watchUntil = SystemClock.elapsedRealtime() + RETURN_WATCH_MS
+            var returns = 0
+            while (returns <= MAX_RETURN_RETRIES && SystemClock.elapsedRealtime() < watchUntil) {
+                if (ForegroundApp.packageName(this, backend) == rule.packageName) {
+                    back = AppLauncher.returnTo(this, backend, target)
+                    returns++
+                    if (!back.success) break
+                }
+                SystemClock.sleep(RETURN_POLL_MS)
+            }
+            if (back != null) {
+                parts += if (back.success) "returned to $label" else "could not return to $label: ${back.detail}"
+            }
+        }
+        return launchedAt
     }
 
     /**
@@ -339,6 +398,9 @@ class RestartService : Service() {
         private const val RETURN_WATCH_MS = 8_000L
         private const val RETURN_POLL_MS = 500L
         private const val MAX_RETURN_RETRIES = 3
+
+        /** How long a restarted VPN gets to show up again before it counts as failed. */
+        private const val VPN_WAIT_MS = 30_000L
 
         /** How soon to look again after deferring a run because the TV was in use. */
         private const val DEFER_RETRY_MS = 5 * 60_000L

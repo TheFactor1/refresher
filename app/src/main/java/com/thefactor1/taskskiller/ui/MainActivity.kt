@@ -10,10 +10,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.thefactor1.taskskiller.R
+import com.thefactor1.taskskiller.data.Backup
 import com.thefactor1.taskskiller.data.Rule
 import com.thefactor1.taskskiller.data.RuleStore
 import com.thefactor1.taskskiller.databinding.ActivityMainBinding
@@ -79,8 +81,36 @@ class MainActivity : AppCompatActivity() {
         // Alarms can be dropped by firmware task-killers, so re-arm on every visit.
         RestartScheduler.scheduleAll(this)
         refresh()
+        offerRestore()
         binding.root.removeCallbacks(ticker)
         binding.root.postDelayed(ticker, TICK_MS)
+    }
+
+    /**
+     * A fresh install with no apps yet: if an earlier install left a backup
+     * (Shizuku has to be set up again first to read it), offer it back, once
+     * per launch of the app.
+     */
+    private fun offerRestore() {
+        if (restoreOffered || RuleStore.get(this).all().isNotEmpty()) return
+        worker.execute {
+            val saved = Backup.load(this)?.takeIf { it.rules.isNotEmpty() } ?: return@execute
+            runOnUiThread {
+                if (isFinishing || restoreOffered || RuleStore.get(this).all().isNotEmpty()) return@runOnUiThread
+                restoreOffered = true
+                val list = saved.rules.joinToString("\n") { "${it.label}: ${Format.intervalWords(it.intervalMinutes).lowercase()}" }
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.restore_title)
+                    .setMessage(getString(R.string.restore_message, Format.moment(this, saved.savedAt), list))
+                    .setPositiveButton(R.string.restore_yes) { _, _ ->
+                        Backup.restore(this, saved)
+                        RestartScheduler.scheduleAll(this)
+                        refresh()
+                    }
+                    .setNegativeButton(R.string.restore_no, null)
+                    .show()
+            }
+        }
     }
 
     override fun onPause() {
@@ -304,5 +334,8 @@ class MainActivity : AppCompatActivity() {
 
     private companion object {
         const val TICK_MS = 30_000L
+
+        /** Offered at most once per process, so "Not now" sticks until the app restarts. */
+        var restoreOffered = false
     }
 }

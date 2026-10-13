@@ -13,6 +13,8 @@ import com.thefactor1.taskskiller.data.RunLog
 import com.thefactor1.taskskiller.databinding.ActivityRuleEditBinding
 import com.thefactor1.taskskiller.databinding.RowSwitchBinding
 import com.thefactor1.taskskiller.databinding.RowValueBinding
+import com.thefactor1.taskskiller.data.Backup
+import com.thefactor1.taskskiller.schedule.WakeWatch
 import com.thefactor1.taskskiller.schedule.RestartScheduler
 import com.thefactor1.taskskiller.status.RunKind
 import com.thefactor1.taskskiller.util.Format
@@ -49,6 +51,7 @@ class RuleEditActivity : AppCompatActivity() {
 
         title(binding.intervalRow, R.string.rule_interval, R.string.rule_interval_hint)
         title(binding.asleepRow, R.string.rule_asleep, R.string.rule_asleep_hint)
+        title(binding.turnOnRow, R.string.rule_turn_on, R.string.rule_turn_on_hint)
         title(binding.reopenRow, R.string.rule_reopen, R.string.rule_reopen_hint)
         title(binding.delayRow, R.string.rule_delay, R.string.rule_delay_hint)
         title(binding.wakeRow, R.string.rule_wake, R.string.rule_wake_hint)
@@ -61,6 +64,7 @@ class RuleEditActivity : AppCompatActivity() {
             r.copy(relaunchDelayMs = (r.relaunchDelayMs + dir * DELAY_STEP_MS).coerceIn(0L, DELAY_MAX_MS))
         }
         toggle(binding.asleepRow) { it.copy(skipWhileScreenOn = !it.skipWhileScreenOn) }
+        toggle(binding.turnOnRow) { it.copy(refreshOnWake = !it.refreshOnWake) }
         toggle(binding.reopenRow) { if (canReopen(it)) it.copy(relaunch = !it.relaunch) else it }
         toggle(binding.wakeRow) { if (it.relaunch) it.copy(wakeScreen = !it.wakeScreen) else it }
 
@@ -99,6 +103,8 @@ class RuleEditActivity : AppCompatActivity() {
         store.upsert(saved)
         if (saved.enabled && store.masterEnabled) RestartScheduler.schedule(this, saved)
         else RestartScheduler.cancel(this, saved.id)
+        WakeWatch.sync(this)
+        Backup.saveAsync(this)
         bind()
     }
 
@@ -114,6 +120,7 @@ class RuleEditActivity : AppCompatActivity() {
         binding.delayRow.rowMore.alpha = if (rule.relaunchDelayMs >= DELAY_MAX_MS) DIM else 1f
 
         binding.asleepRow.rowSwitch.isChecked = rule.skipWhileScreenOn
+        binding.turnOnRow.rowSwitch.isChecked = rule.refreshOnWake
         val reopenable = canReopen(rule)
         binding.reopenRow.rowSwitch.isChecked = rule.relaunch && reopenable
         binding.reopenRow.rowHint.setText(if (reopenable) R.string.rule_reopen_hint else R.string.rule_reopen_none)
@@ -142,7 +149,7 @@ class RuleEditActivity : AppCompatActivity() {
         listOf(binding.intervalRow, binding.delayRow).forEach {
             it.root.contentDescription = "${it.rowTitle.text}: ${it.rowValue.text}"
         }
-        listOf(binding.asleepRow, binding.reopenRow, binding.wakeRow).forEach {
+        listOf(binding.asleepRow, binding.turnOnRow, binding.reopenRow, binding.wakeRow).forEach {
             it.root.contentDescription = "${it.rowTitle.text}: ${if (it.rowSwitch.isChecked) "on" else "off"}"
         }
     }
@@ -164,6 +171,8 @@ class RuleEditActivity : AppCompatActivity() {
         }
         RestartScheduler.cancel(this, ruleId)
         store.delete(ruleId)
+        WakeWatch.sync(this)
+        Backup.saveAsync(this)
         finish()
     }
 

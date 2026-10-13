@@ -29,6 +29,11 @@ data class Rule(
      */
     val skipWhileScreenOn: Boolean = true,
     /**
+     * Also restart the app as the TV turns on (at most every
+     * [WAKE_MIN_GAP_MINUTES]), so a viewing starts on a fresh connection.
+     */
+    val refreshOnWake: Boolean = false,
+    /**
      * When the countdown started for a rule that has not run yet. Without a
      * persisted anchor the "first run" time would be recomputed as
      * `now + interval` every time the schedule was rebuilt, so simply opening
@@ -50,6 +55,7 @@ data class Rule(
         put(KEY_RELAUNCH_DELAY, relaunchDelayMs)
         put(KEY_WAKE_SCREEN, wakeScreen)
         put(KEY_SKIP_SCREEN_ON, skipWhileScreenOn)
+        put(KEY_REFRESH_ON_WAKE, refreshOnWake)
         put(KEY_ANCHOR, anchorAt)
         put(KEY_LAST_RUN, lastRunAt)
         put(KEY_LAST_RESULT, lastResult)
@@ -65,6 +71,7 @@ data class Rule(
         private const val KEY_RELAUNCH_DELAY = "relaunchDelay"
         private const val KEY_WAKE_SCREEN = "wakeScreen"
         private const val KEY_SKIP_SCREEN_ON = "skipScreenOn"
+        private const val KEY_REFRESH_ON_WAKE = "refreshOnWake"
         private const val KEY_ANCHOR = "anchorAt"
         private const val KEY_LAST_RUN = "lastRun"
         private const val KEY_LAST_RESULT = "lastResult"
@@ -77,6 +84,9 @@ data class Rule(
          */
         const val MIN_INTERVAL_MINUTES = 5
         const val MAX_INTERVAL_MINUTES = 24 * 60
+
+        /** A TV turned off and on again soon after doesn't restart the app again. */
+        const val WAKE_MIN_GAP_MINUTES = 30
 
         /**
          * Stored rules are JSON, so this input is not necessarily one we wrote,
@@ -105,6 +115,7 @@ data class Rule(
             relaunchDelayMs = json.optLong(KEY_RELAUNCH_DELAY, 3_000L),
             wakeScreen = json.optBoolean(KEY_WAKE_SCREEN, false),
             skipWhileScreenOn = json.optBoolean(KEY_SKIP_SCREEN_ON, true),
+            refreshOnWake = json.optBoolean(KEY_REFRESH_ON_WAKE, false),
             anchorAt = json.optLong(KEY_ANCHOR, 0L),
             lastRunAt = json.optLong(KEY_LAST_RUN, 0L),
             lastResult = json.optString(KEY_LAST_RESULT, "")

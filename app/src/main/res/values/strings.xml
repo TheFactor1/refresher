@@ -80,6 +80,15 @@
     <string name="rule_reopen_none">This app can\'t be opened from the home screen, so it\'s only stopped</string>
     <string name="rule_delay">Wait before opening it</string>
     <string name="rule_delay_hint">Gives the app time to close fully</string>
+    <string name="rule_turn_on">Also when the TV turns on</string>
+    <string name="rule_turn_on_hint">A fresh start for each viewing, at most every 30 minutes</string>
+    <string name="wake_channel">Refresh when the TV turns on</string>
+    <string name="wake_notification_title">Refresher</string>
+    <string name="wake_notification_text">Ready to refresh when the TV turns on</string>
+    <string name="restore_title">Restore your apps?</string>
+    <string name="restore_message">Refresher found a backup from %1$s:\n\n%2$s</string>
+    <string name="restore_yes">Restore</string>
+    <string name="restore_no">Not now</string>
     <string name="rule_wake">Wake the screen to open it</string>
     <string name="rule_wake_hint">Off: it opens in the dark, then goes back to Home</string>
     <string name="rule_restart_now">Restart now</string>

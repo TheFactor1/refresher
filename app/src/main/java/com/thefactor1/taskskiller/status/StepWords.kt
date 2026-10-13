@@ -19,6 +19,8 @@ object StepWords {
             s.startsWith("returned to ") -> "Back to " + s.removePrefix("returned to ")
             s.startsWith("could not return to Home") -> "Couldn't go back to the home screen"
             s.startsWith("could not return to ") -> "Couldn't go back to " + s.removePrefix("could not return to ").substringBefore(":")
+            s == "VPN didn't come back" -> "The VPN didn't reconnect, even after a second try"
+            s.startsWith("VPN back in ") -> "VPN reconnected in " + s.removePrefix("VPN back in ")
             s.startsWith("Deferred") -> "Skipped: the screen was on"
             s.startsWith("Skipped:") -> "Skipped:" + s.removePrefix("Skipped:")
             else -> s.replaceFirstChar { it.uppercase() }
@@ -28,6 +30,6 @@ object StepWords {
     /** A step that reports something going wrong, drawn in red. */
     fun isProblem(step: String): Boolean {
         val s = step.lowercase()
-        return "failed" in s || "could not" in s || "error" in s || s.startsWith("skipped:") && "not installed" in s
+        return "failed" in s || "could not" in s || "didn't come back" in s || "error" in s || s.startsWith("skipped:") && "not installed" in s
     }
 }

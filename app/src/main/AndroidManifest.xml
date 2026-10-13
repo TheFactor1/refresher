@@ -45,6 +45,8 @@
     <!-- Only ever used for 127.0.0.1: the box's own network-debugging port,
          which is how Shizuku gets started without a computer. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- To see whether a restarted VPN came back (VpnCheck). -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <queries>
         <intent>
@@ -121,6 +123,15 @@
         <!-- directBootAware so an alarm that lands before the first unlock can
              still be serviced; all state it touches lives in device-protected
              storage. -->
+        <service
+            android:name=".schedule.WakeWatchService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Waits for the display to turn on to restart user-selected apps" />
+        </service>
+
         <service
             android:name=".schedule.RestartService"
             android:exported="false"

@@ -193,7 +193,19 @@ class RestartService : Service() {
                 // whatever they were looking at is put back.
                 SystemClock.sleep(RETURN_DELAY_MS)
                 val label = PackageUtil.label(this, onScreenBefore)
-                val back = AppLauncher.returnTo(this, backend, onScreenBefore)
+                var back = AppLauncher.returnTo(this, backend, onScreenBefore)
+                // Some apps open a second screen of their own once they are up
+                // (NordVPN's connection screen ~0.4 s after the first return), which
+                // lands on top again. Keep watching briefly and step back in front.
+                val watchUntil = SystemClock.elapsedRealtime() + RETURN_WATCH_MS
+                var retries = 0
+                while (back.success && retries < MAX_RETURN_RETRIES && SystemClock.elapsedRealtime() < watchUntil) {
+                    SystemClock.sleep(RETURN_POLL_MS)
+                    if (ForegroundApp.packageName(this, backend) == rule.packageName) {
+                        back = AppLauncher.returnTo(this, backend, onScreenBefore)
+                        retries++
+                    }
+                }
                 parts += if (back.success) "returned to $label" else "could not return to $label: ${back.detail}"
             }
         }
@@ -322,6 +334,11 @@ class RestartService : Service() {
 
         /** With the screen on, how long the relaunched app shows before the previous one returns. */
         private const val RETURN_DELAY_MS = 1_500L
+
+        /** How long after returning to watch for the app popping back on top. */
+        private const val RETURN_WATCH_MS = 8_000L
+        private const val RETURN_POLL_MS = 500L
+        private const val MAX_RETURN_RETRIES = 3
 
         /** How soon to look again after deferring a run because the TV was in use. */
         private const val DEFER_RETRY_MS = 5 * 60_000L

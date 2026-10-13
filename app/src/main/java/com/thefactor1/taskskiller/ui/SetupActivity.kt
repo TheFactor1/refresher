@@ -40,6 +40,12 @@ class SetupActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.autoSetupButton.setOnClickListener { runAutoSetup() }
+        binding.whatsNewRow.rowTitle.setText(R.string.whats_new_row)
+        binding.whatsNewRow.rowHint.text = getString(R.string.whats_new_row_hint, WhatsNew.versionName(this))
+        binding.whatsNewRow.checkIcon.visibility = View.GONE
+        binding.whatsNewRow.checkAction.setText(R.string.whats_new_open)
+        binding.whatsNewRow.checkAction.visibility = View.VISIBLE
+        binding.whatsNewRow.root.setOnClickListener { WhatsNew.show(this) }
         binding.pauseAllRow.rowTitle.setText(R.string.setup_pause_all)
         binding.pauseAllRow.rowHint.setText(R.string.setup_pause_all_desc)
         binding.pauseAllRow.root.setOnClickListener {

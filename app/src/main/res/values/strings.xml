@@ -48,17 +48,18 @@
     <string name="add_app">Add an app</string>
     <string name="add_app_hint">Pick an app and how often to restart it</string>
 
-    <string name="chip_shizuku_ok">Shizuku running</string>
-    <string name="chip_shizuku_bad">Shizuku not running</string>
-    <string name="chip_auto_start_ok">Starts after a reboot</string>
-    <string name="chip_auto_start_bad">Won\'t start after a reboot</string>
+    <string name="chip_shizuku_ok">Shizuku on</string>
+    <string name="chip_shizuku_bad">Shizuku off</string>
+    <string name="chip_auto_start_ok">Auto-start on</string>
+    <string name="chip_auto_start_bad">No auto-start</string>
     <string name="chip_exact_ok">Exact timing</string>
     <string name="chip_exact_bad">No exact timing</string>
-    <string name="chip_battery_ok">Battery saving off</string>
-    <string name="chip_battery_bad">Battery saving on</string>
-    <string name="chip_background_ok">Opens apps in the background</string>
-    <string name="chip_background_bad">Can\'t open apps in the background</string>
+    <string name="chip_battery_ok">Battery OK</string>
+    <string name="chip_battery_bad">Battery saver on</string>
+    <string name="chip_background_ok">Reopens apps</string>
+    <string name="chip_background_bad">Can\'t reopen apps</string>
     <string name="chip_activity">Activity</string>
+    <string name="nav_setup">Setup</string>
 
     <!-- App cards -->
     <string name="card_every_asleep">Every %1$s, while the TV sleeps</string>
@@ -85,6 +86,11 @@
     <string name="wake_channel">Refresh when the TV turns on</string>
     <string name="wake_notification_title">Refresher</string>
     <string name="wake_notification_text">Ready to refresh when the TV turns on</string>
+    <string name="whats_new_title">What\'s new in Refresher %1$s</string>
+    <string name="whats_new_ok">Got it</string>
+    <string name="whats_new_row">What\'s new</string>
+    <string name="whats_new_row_hint">Refresher %1$s. See the latest changes</string>
+    <string name="whats_new_open">Open</string>
     <string name="restore_title">Restore your apps?</string>
     <string name="restore_message">Refresher found a backup from %1$s:\n\n%2$s</string>
     <string name="restore_yes">Restore</string>

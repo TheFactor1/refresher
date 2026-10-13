@@ -1,0 +1,21 @@
+## 0.5.1
+These notes: Refresher shows what changed after each update, and any time under Setup › What's new.
+All the checks fit on the home screen at once, and Activity and Setup have their own buttons at the top right.
+
+## 0.5.0
+Refresher can also restart an app when the TV turns on, for a fresh start each time you watch (at most every 30 minutes). Turn it on per app: "Also when the TV turns on".
+After restarting a VPN, Refresher checks it really reconnected and tries once more if it didn't. The log shows how long it took.
+Refresher keeps a backup of your apps that survives reinstalling it, and offers to restore it after setup.
+A restart never pulls you out of an app you just opened.
+
+## 0.4.0
+"Refresh now" ignores repeat presses within a minute, so nothing can keep cutting your VPN.
+Tighter security: Refresher now ships as a release build with its own signing key.
+
+## 0.3.1
+After a restart, the screen you were on stays in front even if the app opens a screen of its own (like NordVPN's connect screen).
+
+## 0.3.0
+A new look: the home screen says straight away whether everything's working, and how to fix it if not.
+If Shizuku has stopped, a restart starts it again first. If Refresher still can't stop the app, the log says so instead of reporting success.
+Next-run times fit on the app cards at large text sizes.

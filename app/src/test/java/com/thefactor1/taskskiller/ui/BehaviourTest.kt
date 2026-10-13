@@ -259,10 +259,12 @@ class BehaviourTest {
         Fixture.rule(Fixture.NORD, 1)
         val a = home()
         val chips = a.findViewById<ViewGroup>(R.id.chips)
-        assertEquals(6, chips.childCount)
+        assertEquals(5, chips.childCount)
         chips.getChildAt(0).performClick()
         assertEquals(SetupActivity::class.java.name, shadowOf(a).nextStartedActivity.component!!.className)
-        chips.getChildAt(5).performClick()
+        a.findViewById<View>(R.id.setupButton).performClick()
+        assertEquals(SetupActivity::class.java.name, shadowOf(a).nextStartedActivity.component!!.className)
+        a.findViewById<View>(R.id.activityButton).performClick()
         assertEquals(LogActivity::class.java.name, shadowOf(a).nextStartedActivity.component!!.className)
     }
 

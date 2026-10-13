@@ -8,11 +8,14 @@ import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.util.TypedValue
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.thefactor1.taskskiller.R
 import com.thefactor1.taskskiller.data.Backup
@@ -72,6 +75,8 @@ class MainActivity : AppCompatActivity() {
         binding.appsRecycler.isFocusable = false
 
         binding.fixButton.setOnClickListener { report?.let { runFix(it.fix) } }
+        binding.activityButton.setOnClickListener { startActivity(Intent(this, LogActivity::class.java)) }
+        binding.setupButton.setOnClickListener { startActivity(Intent(this, SetupActivity::class.java)) }
 
         requestNotificationPermissionIfNeeded()
     }
@@ -82,6 +87,7 @@ class MainActivity : AppCompatActivity() {
         RestartScheduler.scheduleAll(this)
         refresh()
         offerRestore()
+        WhatsNew.showAfterUpdate(this)
         binding.root.removeCallbacks(ticker)
         binding.root.postDelayed(ticker, TICK_MS)
     }
@@ -244,19 +250,20 @@ class MainActivity : AppCompatActivity() {
         shownChips = state
         binding.chips.removeAllViews()
         val inflater = LayoutInflater.from(this)
-        r.checks.forEach { check ->
+        val gap = resources.getDimensionPixelSize(R.dimen.space_s)
+        r.checks.forEachIndexed { i, check ->
             val chip = inflater.inflate(R.layout.view_chip, binding.chips, false) as TextView
             chip.text = chipText(check)
+            chip.maxLines = 1
+            // A fifth of the row each: at large text sizes a label shrinks a little rather than wrap or clip.
+            TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(chip, 10, 14, 1, TypedValue.COMPLEX_UNIT_SP)
             chip.setCompoundDrawablesRelativeWithIntrinsicBounds(dot(if (check.ok) R.color.ok else R.color.warn), null, null, null)
             chip.setOnClickListener { startActivity(Intent(this, SetupActivity::class.java)) }
+            chip.layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f).apply {
+                marginEnd = if (i == r.checks.lastIndex) 0 else gap
+            }
             binding.chips.addView(chip)
         }
-        val activity = inflater.inflate(R.layout.view_chip, binding.chips, false) as TextView
-        activity.setText(R.string.chip_activity)
-        activity.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null)
-        activity.setPaddingRelative(activity.paddingEnd, activity.paddingTop, activity.paddingEnd, activity.paddingBottom)
-        activity.setOnClickListener { startActivity(Intent(this, LogActivity::class.java)) }
-        binding.chips.addView(activity)
         focusedIndex?.let { binding.chips.getChildAt(it)?.requestFocus() }
     }
 

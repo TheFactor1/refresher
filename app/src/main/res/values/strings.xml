@@ -163,6 +163,7 @@
     <string name="refresh_now">Refresh now</string>
     <string name="refresh_now_started">Refreshing %1$s</string>
     <string name="refresh_now_none">No apps to refresh. Open Refresher to add one.</string>
+    <string name="refresh_now_too_soon">Refreshed less than a minute ago. Try again in a moment.</string>
 
     <string name="adb_body">Only needed if \"Set up automatically\" can\'t connect.\n\nConnect with <b>adb connect &lt;tv-ip&gt;:5555</b>, then run whichever block matches how you want apps stopped.\n\n<b>Shizuku (recommended, no root)</b>\nInstall Shizuku on the TV, then after each reboot run:\n  adb shell \'$(dirname $(pm path moe.shizuku.privileged.api | cut -d: -f2))/lib/arm64/libshizuku.so\'\nOpen Refresher and choose Allow when Shizuku asks.\n\n<b>Device owner (survives reboots, no root)</b>\nOn a box with no accounts added:\n  adb shell dpm set-device-owner com.thefactor1.taskskiller/.kill.AdminReceiver\nEach refresh briefly hides the app, which Android treats as removing and re-adding it: its tile may move on the home screen, and apps that depend on it restart too.\n\n<b>Permissions that have no TV settings screen</b>\n  adb shell appops set com.thefactor1.taskskiller SYSTEM_ALERT_WINDOW allow\n  adb shell dumpsys deviceidle whitelist +com.thefactor1.taskskiller\n\n<b>Root</b>\nNothing to do: grant Refresher root when your superuser app asks.</string>
 </resources>

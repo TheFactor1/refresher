@@ -11,6 +11,7 @@ import android.view.View
 import android.util.TypedValue
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -79,6 +80,21 @@ class MainActivity : AppCompatActivity() {
         binding.setupButton.setOnClickListener { startActivity(Intent(this, SetupActivity::class.java)) }
 
         requestNotificationPermissionIfNeeded()
+
+        // Back from here always lands on the TV's home screen. Finishing alone
+        // would show whatever task sits behind ours, and after a restart that is
+        // the app just reopened (NordVPN's connect screen), not where you came from.
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                try {
+                    startActivity(Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                } catch (e: android.content.ActivityNotFoundException) {
+                    // No launcher to go to: fall back to plain finishing below.
+                }
+                finish()
+            }
+        })
     }
 
     override fun onResume() {

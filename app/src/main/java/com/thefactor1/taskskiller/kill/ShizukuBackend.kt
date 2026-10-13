@@ -68,9 +68,9 @@ object ShizukuBackend : KillBackend {
     }
 
     override fun launch(context: Context, packageName: String): OpResult {
-        val component = PackageUtil.launchComponent(context, packageName)
+        val args = PackageUtil.launchArgs(context, packageName)
             ?: return OpResult.fail("No launchable activity in $packageName")
-        val result = exec(arrayOf("am", "start", "-n", component.flattenToShortString()))
+        val result = exec(args.toTypedArray())
         return if (result.success) OpResult.OK
         else OpResult.fail("am start exited ${result.exitCode}: ${result.output}")
     }

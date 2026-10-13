@@ -1,3 +1,6 @@
+## 0.6.2
+Back works cleanly: after a restart returns you to Refresher, Back no longer walks you through copies of screens you'd already left, and Back from the main screen always goes to the TV's home screen.
+
 ## 0.6.1
 The "Clear its cache too" option from 0.6.0 is gone: Android on this TV doesn't let one app clear another app's cache, so it couldn't work. Nothing was ever deleted.
 

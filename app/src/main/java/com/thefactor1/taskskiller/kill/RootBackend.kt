@@ -82,9 +82,11 @@ object RootBackend : KillBackend {
         if (!PackageUtil.isPlausiblePackageName(packageName)) {
             return OpResult.fail("Refusing to build a shell command for \"$packageName\"")
         }
-        val component = PackageUtil.launchComponent(context, packageName)
+        // Every word is an intent constant, a hex flag or the component of a
+        // package whose name was just checked, so joining them is safe here.
+        val args = PackageUtil.launchArgs(context, packageName)
             ?: return OpResult.fail("No launchable activity in $packageName")
-        val result = Shell.runAsRoot("am start -n ${component.flattenToShortString()}")
+        val result = Shell.runAsRoot(args.joinToString(" "))
         return if (result.success) OpResult.OK
         else OpResult.fail("am start exited ${result.exitCode}: ${result.output}")
     }

@@ -255,6 +255,14 @@ class BehaviourTest {
         assertTrue(a.findViewById<View>(R.id.restartCard).isShown)
     }
 
+    @Test fun backFromHomeGoesToTheTvHomeScreen() {
+        val a = home()
+        a.onBackPressedDispatcher.onBackPressed()
+        val next = shadowOf(a).nextStartedActivity
+        assertTrue(next.hasCategory(android.content.Intent.CATEGORY_HOME))
+        assertTrue(a.isFinishing)
+    }
+
     @Test fun chipsOpenSetupAndActivity() {
         Fixture.rule(Fixture.NORD, 1)
         val a = home()

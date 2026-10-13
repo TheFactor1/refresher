@@ -35,6 +35,26 @@ object PackageUtil {
             ?: pm.getLaunchIntentForPackage(packageName)
     }
 
+    /**
+     * `am start` arguments for opening [packageName] exactly as its launcher icon
+     * does: same action, categories and component, new-task plus reset flags.
+     * With an intent identical to the one that started its task, Android brings
+     * the existing task forward with whatever screen it was on, instead of
+     * stacking a fresh copy of the first screen on top (which left Refresher's
+     * Back button walking through duplicates after a restart returned to it).
+     */
+    fun launchArgs(context: Context, packageName: String): List<String>? {
+        val intent = launchIntent(context, packageName) ?: return null
+        val component = intent.component ?: return null
+        return buildList {
+            add("am"); add("start")
+            add("-a"); add(intent.action ?: Intent.ACTION_MAIN)
+            intent.categories?.sorted()?.forEach { add("-c"); add(it) }
+            add("-n"); add(component.flattenToShortString())
+            add("-f"); add("0x" + Integer.toHexString(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED))
+        }
+    }
+
     /** The component behind [launchIntent], formatted for `am start -n`. */
     fun launchComponent(context: Context, packageName: String): ComponentName? =
         launchIntent(context, packageName)?.component

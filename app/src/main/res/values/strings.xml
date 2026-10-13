@@ -81,6 +81,8 @@
     <string name="rule_reopen_none">This app can\'t be opened from the home screen, so it\'s only stopped</string>
     <string name="rule_delay">Wait before opening it</string>
     <string name="rule_delay_hint">Gives the app time to close fully</string>
+    <string name="rule_autosave">Changes save as you make them</string>
+    <string name="rule_saved">✓  Saved</string>
     <string name="rule_turn_on">Also when the TV turns on</string>
     <string name="rule_turn_on_hint">A fresh start for each viewing, at most every 30 minutes</string>
     <string name="wake_channel">Refresh when the TV turns on</string>

@@ -45,6 +45,17 @@ class BehaviourTest {
         Robolectric.buildActivity(RuleEditActivity::class.java, Intent(Fixture.context, RuleEditActivity::class.java)
             .putExtra(RuleEditActivity.EXTRA_RULE_ID, id)).setup().visible().get().also { idle(100) }
 
+    @Test fun changesSayTheyWereSaved() {
+        Fixture.rule(Fixture.NORD, 1)
+        val a = ruleScreen()
+        val note = a.findViewById<TextView>(R.id.savedNote)
+        assertEquals("Changes save as you make them", note.text.toString())
+        a.findViewById<View>(R.id.asleepRow).performClick(); idle()
+        assertTrue(note.text.toString().contains("Saved"))
+        idle(2_500)
+        assertEquals("Changes save as you make them", note.text.toString())
+    }
+
     @Test fun intervalStepsWithLeftAndRightAndSaves() {
         Fixture.rule(Fixture.NORD, 1, intervalMinutes = 360)
         val a = ruleScreen()

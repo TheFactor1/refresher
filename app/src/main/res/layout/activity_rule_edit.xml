@@ -132,6 +132,16 @@
                     android:layout_marginTop="@dimen/space_s"
                     android:text="@string/rule_pause" />
 
+                <!-- No Save button: every change is stored at once, and this says so. -->
+                <TextView
+                    android:id="@+id/savedNote"
+                    style="@style/Text.RowSub"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_m"
+                    android:gravity="center_horizontal"
+                    android:text="@string/rule_autosave" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="0dp"

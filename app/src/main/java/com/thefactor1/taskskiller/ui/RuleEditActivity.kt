@@ -106,6 +106,20 @@ class RuleEditActivity : AppCompatActivity() {
         WakeWatch.sync(this)
         Backup.saveAsync(this)
         bind()
+        flashSaved()
+    }
+
+    private val unflashSaved = Runnable {
+        binding.savedNote.setText(R.string.rule_autosave)
+        binding.savedNote.setTextColor(ContextCompat.getColorStateList(this, R.color.row_text_secondary))
+    }
+
+    /** A moment of "✓ Saved" after each change, then back to the standing note. */
+    private fun flashSaved() {
+        binding.savedNote.setText(R.string.rule_saved)
+        binding.savedNote.setTextColor(ContextCompat.getColor(this, R.color.ok))
+        binding.savedNote.removeCallbacks(unflashSaved)
+        binding.savedNote.postDelayed(unflashSaved, SAVED_FLASH_MS)
     }
 
     private fun bind() {
@@ -218,6 +232,7 @@ class RuleEditActivity : AppCompatActivity() {
         INTERVALS.indices.minByOrNull { kotlin.math.abs(INTERVALS[it] - minutes) } ?: 0
 
     companion object {
+        private const val SAVED_FLASH_MS = 2_000L
         const val EXTRA_RULE_ID = "rule_id"
 
         /** Choices rather than a free value: a D-pad steps one at a time. */

@@ -109,7 +109,7 @@ object ShizukuStarter {
         return if (setupError != null) Step("Start Shizuku", false, setupError) else step
     }
 
-    private fun awaitBinder(): Boolean {
+    fun awaitBinder(): Boolean {
         val deadline = SystemClock.elapsedRealtime() + BINDER_WAIT_MS
         while (SystemClock.elapsedRealtime() < deadline) {
             if (ShizukuBackend.isBinderAlive()) return true

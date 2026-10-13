@@ -19,6 +19,8 @@ import com.thefactor1.taskskiller.R
 import com.thefactor1.taskskiller.data.Rule
 import com.thefactor1.taskskiller.data.RuleStore
 import com.thefactor1.taskskiller.data.RunLog
+import com.thefactor1.taskskiller.setup.ShizukuStarter
+import com.thefactor1.taskskiller.kill.ShizukuBackend
 import com.thefactor1.taskskiller.kill.KillBackends
 import com.thefactor1.taskskiller.launch.AppLauncher
 import com.thefactor1.taskskiller.ui.MainActivity
@@ -124,7 +126,26 @@ class RestartService : Service() {
         // Sampled before the kill: the question is whether anyone was watching.
         val displayWasOff = !ScreenUtil.isScreenOn(this)
 
+        // Shizuku dies with every reboot and now and then on its own. A run that
+        // finds it down starts it again first, rather than dropping to a method
+        // that cannot stop a VPN.
+        if (ShizukuBackend.isShizukuInstalled(this) && !ShizukuBackend.isBinderAlive() && store.autoStartShizuku) {
+            ShizukuStarter.startInBackground(this)
+            ShizukuStarter.awaitBinder()
+        }
+
         val backend = KillBackends.resolve(this)
+
+        // With Shizuku installed, it is the intended way to stop apps. If it still
+        // can't be used (stopped, or Refresher's permission lost, e.g. by a
+        // reinstall), the weak fallback would leave a VPN running and log a
+        // "Refreshed" that never happened (Sep 26 - Oct 12 on the Shield), so the
+        // run fails and says why.
+        if (!backend.isForceStop && ShizukuBackend.isShizukuInstalled(this)) {
+            record(rule, "Refresh failed: ${ShizukuBackend.unavailableReason(this)}. Open Refresher to fix it", false)
+            reArm(ruleId, rule)
+            return
+        }
 
         // What was on screen, so the relaunch does not leave the viewer looking
         // at the relaunched app. Run now starts from our own editor, so without

@@ -1,22 +1,68 @@
-# TasksKiller
+# Refresher
 
 An Android TV app that kills chosen apps on a timer and brings them straight
 back, including while the box is asleep. Built for the cases where an app needs
 a periodic kick — VPN clients that drift off a tunnel, streaming apps that
 accumulate cache, anything that behaves better after a cold start.
 
+## What it is, and what it can see
+
+Refresher does one job: on a schedule you choose, it stops an app on your own
+TV and opens it again. It is open source, so none of this has to be taken on
+trust.
+
+**Privacy**
+
+- No account, no sign-in, no ads, no analytics, no crash reporting, no
+  tracking libraries.
+- Nothing is uploaded and nothing is downloaded. The only network connection it
+  ever opens goes to the TV itself (`127.0.0.1`), to start Shizuku and run the
+  one-time setup. The `INTERNET` permission exists only for that local
+  connection.
+- It does not read your viewing, your files, your contacts or your accounts. It
+  stores only your rules (which app, how often, a few switches) and a short
+  activity log, on the TV.
+- Backup of those rules is a single small file on the TV
+  (`/data/local/tmp/refresher/backup.json`). It is only app names and
+  intervals, and **Setup > Remove Refresher's setup** deletes it.
+- The one-time setup key (for the TV's own network debugging) is generated on
+  the TV, stays inside the app's private storage and never leaves it.
+
+**Why each permission**
+
+| Permission | Why |
+|---|---|
+| Kill background processes, Shizuku | Stopping the apps you picked |
+| Exact alarms, wake lock, foreground service | Running on time, even while the TV sleeps |
+| Receive boot completed | Re-arming your schedule after a restart |
+| Display over other apps | Letting Android allow reopening an app from the background |
+| Notifications | The notice shown while a restart is running |
+| Network state | Telling when a VPN has reconnected |
+| Internet | Local connection to the TV itself, see above |
+| Request delete packages | The optional "uninstall Refresher" step in Remove setup |
+
+**Exposed components.** Only the launcher entries, the boot receiver (it just
+re-arms schedules), Shizuku's own provider and the device-admin receiver (both
+guarded by system permissions) are reachable by other apps. The "Refresh now"
+tile can be started by any app, so it is rate-limited to one run a minute.
+
+**Verify it yourself.** Releases are signed with a key kept off the repository.
+`adb shell dumpsys package com.thefactor1.taskskiller` lists exactly the
+permissions above, and **Setup > Remove Refresher's setup** undoes everything
+automatic setup changed.
+
 ## What Android actually allows
 
 Worth being blunt about this up front, because it shapes the whole design: **an
 ordinary Android app cannot force-stop another app.** That privilege belongs to
-the shell, root, and device owners. So TasksKiller ships four kill backends and
+the shell, root, and device owners. So Refresher ships four kill backends and
 uses the strongest one available on your box:
 
 | Backend | Setup | Result |
 |---|---|---|
 | **Shizuku** | Install Shizuku, start it via ADB once per boot | Real `am force-stop` |
 | **Device owner** | One `dpm` command on a box with no accounts | Real force-stop via hide/unhide |
-| **Root** | Grant TasksKiller root | Real `am force-stop` |
+| **Root** | Grant Refresher root | Real `am force-stop` |
 | **Background processes** | None | Best-effort; **foreground services survive** |
 
 The last one works out of the box but will not stop most VPN clients, because
@@ -55,7 +101,7 @@ platform makes no guarantees, though on a plugged-in TV it generally holds.
 ## Relaunching
 
 From Android 10, an app in the background is normally not allowed to start an
-activity. TasksKiller handles this two ways:
+activity. Refresher handles this two ways:
 
 1. With a privileged backend (Shizuku or root) it runs `am start` as the shell
    user, which is exempt from the restriction entirely. This is the reliable path.
@@ -98,7 +144,7 @@ adb install -r app-debug.apk
 
 ## One-time ADB setup
 
-Also shown in the app under **Setup & permissions**.
+Also shown in the app under **Setup**.
 
 **Shizuku (recommended, no root).** Install Shizuku on the TV, then after each
 boot:
@@ -107,7 +153,7 @@ boot:
 adb shell sh /storage/emulated/0/Android/data/moe.shizuku.privileged.api/start.sh
 ```
 
-Then open TasksKiller → Setup & permissions → Grant Shizuku permission.
+Then open Refresher → Setup → Grant Shizuku permission.
 
 **Device owner (survives reboots, no root).** On a box with no accounts added:
 

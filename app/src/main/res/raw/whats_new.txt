@@ -1,3 +1,6 @@
+## 0.6.3
+Setup is simpler: one card says what to have ready, exactly what automatic setup changes, and the two questions the TV will ask. The results are in plain words.
+
 ## 0.6.2
 Back works cleanly: after a restart returns you to Refresher, Back no longer walks you through copies of screens you'd already left, and Back from the main screen always goes to the TV's home screen.
 

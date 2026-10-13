@@ -34,12 +34,6 @@
                 android:accessibilityHeading="true" />
         </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/autoSetupButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/space_xl"
-            android:text="@string/auto_setup" />
     </LinearLayout>
 
     <com.thefactor1.taskskiller.ui.FocusScrollView
@@ -58,6 +52,55 @@
             android:orientation="vertical"
             android:showDividers="middle">
 
+            <!-- Automatic setup: what to have ready, exactly what it changes, what the TV will ask. -->
+            <LinearLayout
+                android:id="@+id/autoCard"
+                style="@style/Row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:focusable="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/autoTitle"
+                        style="@style/Text.RowTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/auto_setup" />
+
+                    <TextView
+                        android:id="@+id/autoIntro"
+                        style="@style/Text.RowSub"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_xs" />
+
+                    <TextView
+                        android:id="@+id/autoDetails"
+                        style="@style/Text.RowSub"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_m"
+                        android:lineSpacingMultiplier="1.25"
+                        android:textColor="@color/text_primary" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/autoSetupButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:layout_marginStart="@dimen/space_xl"
+                    android:text="@string/auto_setup" />
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/setupResult"
                 style="@style/Text.Body"
@@ -67,6 +110,14 @@
                 android:padding="@dimen/row_pad_h"
                 android:textColor="@color/text_primary"
                 android:visibility="gone" />
+
+            <TextView
+                style="@style/Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_m"
+                android:text="@string/setup_status_header"
+                android:accessibilityHeading="true" />
 
             <include android:id="@+id/shizukuRow" layout="@layout/row_check" />
             <include android:id="@+id/autoStartRow" layout="@layout/row_check" />

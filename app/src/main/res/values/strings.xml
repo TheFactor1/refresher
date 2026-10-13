@@ -141,11 +141,26 @@
 
     <!-- Setup -->
     <string name="crumb_setup">Refresher › Setup</string>
-    <string name="setup_title">What Refresher needs</string>
+    <string name="setup_title">Setup</string>
     <string name="auto_setup">Set up automatically</string>
-    <string name="auto_setup_running">Setting up… If the TV asks to allow network debugging, tick Always allow and choose Allow.</string>
+    <string name="auto_setup_running">Setting up… Watch the screen: the TV will ask twice (see above).</string>
+    <string name="setup_status_header">What Refresher needs</string>
+    <string name="auto_setup_card_title">Automatic setup</string>
+    <string name="auto_setup_intro">About 30 seconds. It all happens on this TV: nothing is sent anywhere, and nothing else is changed.</string>
+    <string name="auto_setup_ready_intro">Everything Refresher needs is in place. Run it again any time something here turns orange.</string>
+    <string name="auto_setup_again">Run setup again</string>
+    <string name="auto_setup_ready_title">Everything\'s set up</string>
+    <string name="auto_setup_before">Before you start</string>
+    <string name="auto_setup_before_shizuku">Install Shizuku (free): choose Get Shizuku below.</string>
+    <string name="auto_setup_before_debugging">Turn on Network debugging: Settings › Device Preferences › Developer options. (No Developer options? Settings › Device Preferences › About, press OK on Build 7 times.)</string>
+    <string name="auto_setup_does">What it does</string>
+    <string name="auto_setup_asks">The TV will ask twice</string>
+    <string name="auto_setup_ask_debugging">“Allow network debugging?” Tick Always allow, then choose Allow. This lets Refresher talk to the TV it\'s running on.</string>
+    <string name="auto_setup_ask_shizuku">“Allow Refresher to access Shizuku?” Choose Allow all the time.</string>
+    <string name="auto_setup_step_autostart">Start Shizuku again by itself after the TV restarts</string>
+    <string name="auto_setup_connect_hint">Couldn\'t reach network debugging. Check it\'s on (Settings › Device Preferences › Developer options › Network debugging), then try again. If the TV asked, choose Allow.</string>
     <string name="auto_setup_done">Setup finished.</string>
-    <string name="auto_setup_failed">Setup didn\'t finish. The steps below say where it stopped.</string>
+    <string name="auto_setup_failed">Setup didn\'t finish. Here\'s where it stopped:</string>
     <string name="check_shizuku">Shizuku is running</string>
     <string name="check_shizuku_desc">Lets Refresher stop apps without root</string>
     <string name="check_shizuku_missing">Shizuku isn\'t installed</string>

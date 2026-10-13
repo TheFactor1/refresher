@@ -211,7 +211,7 @@ class ScreensTest(private val fontScale: Float) {
         val problems = common(a.window.decorView.findViewById(android.R.id.content)) +
             LayoutCheck.sameLeft("setup rows", *rows.toTypedArray()) + LayoutCheck.leftAt(rows.first(), gutter) +
             LayoutCheck.sameRight("setup rows", *rows.toTypedArray()) + rightAtGutter(rows.first()) +
-            rightAtGutter(a.findViewById(R.id.autoSetupButton))
+            rightAtGutter(a.findViewById(R.id.autoCard))
         shoot(a, name)
         assertNoProblems(name, problems)
     }

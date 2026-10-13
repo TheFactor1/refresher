@@ -20,7 +20,6 @@ import com.thefactor1.taskskiller.schedule.RestartScheduler
 import com.thefactor1.taskskiller.setup.ShizukuStarter
 import com.thefactor1.taskskiller.status.Health
 import com.thefactor1.taskskiller.status.HealthReader
-import com.thefactor1.taskskiller.status.StepWords
 import java.util.concurrent.Executors
 
 /**
@@ -59,7 +58,9 @@ class SetupActivity : AppCompatActivity() {
         )
         refresh()
         val anyFailing = HealthReader.read(this).let(Health::checks).any { !it.ok }
-        (if (anyFailing) binding.autoSetupButton else binding.shizukuRow.root).requestFocus()
+        // After the first layout: inside the scrolling list a request made during
+        // onCreate doesn't stick.
+        binding.root.post { (if (anyFailing) binding.autoSetupButton else binding.shizukuRow.root).requestFocus() }
     }
 
     override fun onResume() {
@@ -107,6 +108,8 @@ class SetupActivity : AppCompatActivity() {
         bindCheck(binding.backgroundRow, device.backgroundStarts, getString(if (device.backgroundStarts) R.string.check_background else R.string.check_background_bad), getString(R.string.check_background_desc), R.string.check_fix) {
             open(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, appUri()))
         }
+
+        bindAutoCard(device.shizukuInstalled || device.forceStopWithoutShizuku, checks.values.all { it.ok })
 
         binding.pauseAllRow.rowSwitch.isChecked = !store.masterEnabled
         binding.pauseAllRow.root.contentDescription =
@@ -160,20 +163,56 @@ class SetupActivity : AppCompatActivity() {
                 busy = false
                 val connected = steps.firstOrNull()?.ok == true
                 val allOk = steps.isNotEmpty() && steps.all { it.ok }
-                val lines = steps.joinToString("\n") { step ->
-                    val detail = if (step.detail.isBlank()) "" else ": ${step.detail}"
-                    "${if (step.ok) "✓" else "✗"}  ${StepWords.friendly(step.label)}$detail"
-                }
-                showResult(getString(if (allOk) R.string.auto_setup_done else R.string.auto_setup_failed) + "\n" + lines)
                 // A connection that worked once will work after a reboot too, so
                 // that's the point to start Shizuku automatically from now on.
-                if (connected && ShizukuStarter.isInstalled(this)) RuleStore.get(this).autoStartShizuku = true
+                val autoStart = connected && ShizukuStarter.isInstalled(this)
+                if (autoStart) RuleStore.get(this).autoStartShizuku = true
+                val lines = (steps.map { step ->
+                    val detail = if (step.detail.isBlank()) "" else ": ${step.detail}"
+                    "${if (step.ok) "✓" else "✗"}  ${step.label}$detail"
+                } + listOfNotNull(if (autoStart) "✓  ${getString(R.string.auto_setup_step_autostart)}" else null) +
+                    listOfNotNull(if (!connected) "\n" + getString(R.string.auto_setup_connect_hint) else null)
+                ).joinToString("\n")
+                showResult(getString(if (allOk) R.string.auto_setup_done else R.string.auto_setup_failed) + "\n" + lines)
                 if (ShizukuBackend.isBinderAlive() && !ShizukuBackend.hasPermission()) ShizukuBackend.requestPermission()
                 refresh()
                 binding.autoSetupButton.requestFocus()
             }
         }
     }
+
+    /**
+     * The automatic-setup card says, before anything is pressed, what to have
+     * ready, exactly what it changes (the same list it then reports on) and
+     * the two questions the TV asks. Once everything is in place it shrinks to
+     * a one-line "all set" with a way to run it again.
+     */
+    private fun bindAutoCard(shizukuInstalled: Boolean, allOk: Boolean) {
+        binding.autoTitle.setText(if (allOk) R.string.auto_setup_ready_title else R.string.auto_setup_card_title)
+        binding.autoIntro.setText(if (allOk) R.string.auto_setup_ready_intro else R.string.auto_setup_intro)
+        binding.autoSetupButton.setText(if (allOk) R.string.auto_setup_again else R.string.auto_setup)
+
+        val does = listOf(ShizukuStarter.STEP_CONNECT, ShizukuStarter.STEP_START) +
+            ShizukuStarter.settingsSteps(this).map { it.first } +
+            getString(R.string.auto_setup_step_autostart)
+        val html = buildString {
+            if (!allOk) {
+                append("<b>").append(getString(R.string.auto_setup_before)).append("</b><br>")
+                if (!shizukuInstalled) append("•  ").append(esc(getString(R.string.auto_setup_before_shizuku))).append("<br>")
+                append("•  ").append(esc(getString(R.string.auto_setup_before_debugging))).append("<br><br>")
+            }
+            append("<b>").append(getString(R.string.auto_setup_does)).append("</b><br>")
+            does.forEachIndexed { i, step -> append("${i + 1}.  ").append(esc(step)).append("<br>") }
+            if (!allOk) {
+                append("<br><b>").append(getString(R.string.auto_setup_asks)).append("</b><br>")
+                append("•  ").append(esc(getString(R.string.auto_setup_ask_debugging))).append("<br>")
+                append("•  ").append(esc(getString(R.string.auto_setup_ask_shizuku)))
+            }
+        }
+        binding.autoDetails.text = HtmlCompat.fromHtml(html.removeSuffix("<br>"), HtmlCompat.FROM_HTML_MODE_LEGACY)
+    }
+
+    private fun esc(text: String): String = android.text.TextUtils.htmlEncode(text)
 
     private fun showResult(text: String) {
         binding.setupResult.text = text

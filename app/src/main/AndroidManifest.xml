@@ -42,9 +42,11 @@
          which is how a relaunch works while nothing of ours is on screen. -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
-    <!-- Only ever used for 127.0.0.1: the box's own network-debugging port,
-         which is how Shizuku gets started without a computer. -->
+    <!-- 127.0.0.1: the box's own network-debugging port, which is how Shizuku gets started without a
+         computer. And, only when the viewer presses Get in Setup, Shizuku's APK from its GitHub releases. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Installs Shizuku (and nothing else) after checking it is Rikka's signed build: ShizukuDownloader. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <!-- To see whether a restarted VPN came back (VpnCheck). -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Lets "Remove setup" offer the system's own uninstall dialog for Refresher. -->
@@ -179,6 +181,10 @@
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name=".setup.ShizukuInstallReceiver"
+            android:exported="false" />
 
         <provider
             android:name="rikka.shizuku.ShizukuProvider"

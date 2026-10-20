@@ -15,10 +15,13 @@ trust.
 
 - No account, no sign-in, no ads, no analytics, no crash reporting, no
   tracking libraries.
-- Nothing is uploaded and nothing is downloaded. The only network connection it
-  ever opens goes to the TV itself (`127.0.0.1`), to start Shizuku and run the
-  one-time setup. The `INTERNET` permission exists only for that local
-  connection.
+- Nothing is uploaded. The only download is Shizuku itself, and only when you
+  press **Get** in Setup: Refresher fetches the APK from Shizuku's own GitHub
+  releases (`github.com/RikkaApps/Shizuku`), checks that it is Shizuku and is
+  signed by Shizuku's developer, deletes it if not, and hands it to Android's
+  installer for you to confirm. Apart from that, its only network connection
+  goes to the TV itself (`127.0.0.1`), to start Shizuku and run the one-time
+  setup.
 - It does not read your viewing, your files, your contacts or your accounts. It
   stores only your rules (which app, how often, a few switches) and a short
   activity log, on the TV.
@@ -38,7 +41,8 @@ trust.
 | Display over other apps | Letting Android allow reopening an app from the background |
 | Notifications | The notice shown while a restart is running |
 | Network state | Telling when a VPN has reconnected |
-| Internet | Local connection to the TV itself, see above |
+| Internet | Local connection to the TV itself, and the one Shizuku download, see above |
+| Request install packages | Installing Shizuku when you press Get in Setup (nothing else) |
 | Request delete packages | The optional "uninstall Refresher" step in Remove setup |
 
 **Exposed components.** Only the launcher entries, the boot receiver (it just

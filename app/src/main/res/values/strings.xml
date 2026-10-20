@@ -96,7 +96,7 @@
     <string name="privacy_row">Privacy</string>
     <string name="privacy_row_hint">What Refresher can see and does with it</string>
     <string name="privacy_title">Privacy</string>
-    <string name="privacy_body">Refresher stops an app on this TV on a schedule you choose, then opens it again. That is all it does.\n\n•  No account, ads, analytics or tracking.\n•  Nothing is uploaded or downloaded. Its only network connection is to this TV itself, for setup.\n•  It can\'t see what you watch, your files or your accounts.\n•  It keeps your rules and a short activity log on this TV, plus a small backup file of app names and intervals.\n•  Remove Refresher\'s setup, under Setup, undoes everything setup changed and deletes the backup.\n\nIt is open source: github.com/TheFactor1/refresher</string>
+    <string name="privacy_body">Refresher stops an app on this TV on a schedule you choose, then opens it again. That is all it does.\n\n•  No account, ads, analytics or tracking.\n•  Nothing is uploaded. The only download is Shizuku itself, from Shizuku\'s own GitHub page, and only if you press Get in Setup. Refresher checks it is signed by Shizuku\'s developer before installing it. Otherwise its only network connection is to this TV itself, for setup.\n•  It can\'t see what you watch, your files or your accounts.\n•  It keeps your rules and a short activity log on this TV, plus a small backup file of app names and intervals.\n•  Remove Refresher\'s setup, under Setup, undoes everything setup changed and deletes the backup.\n\nIt is open source: github.com/TheFactor1/refresher</string>
     <string name="privacy_ok">Got it</string>
     <string name="restore_title">Restore your apps?</string>
     <string name="restore_message">Refresher found a backup from %1$s:\n\n%2$s</string>
@@ -213,6 +213,13 @@
     <string name="setup_pause_all_desc">Keeps your apps and settings; nothing restarts until you turn this off</string>
     <string name="setup_manual">Manual setup from a computer</string>
     <string name="setting_unavailable">This TV has no screen for that setting. Use the commands under Manual setup.</string>
+    <string name="shizuku_allow_installs">Allow Refresher to install apps, then press Get again. Shizuku is the only app it installs.</string>
+    <string name="shizuku_downloading">Getting Shizuku from its GitHub page…</string>
+    <string name="shizuku_download_failed">Couldn\'t get Shizuku (%1$s). Trying the app store instead.</string>
+    <string name="shizuku_confirm_install">Shizuku %1$s downloaded and checked. Confirm the install on screen.</string>
+    <string name="shizuku_installed">Shizuku installed. Back in Setup, press Start.</string>
+    <string name="shizuku_install_failed">Shizuku didn\'t install: %1$s</string>
+    <string name="shizuku_install_cancelled">cancelled</string>
     <string name="shizuku_store_unavailable">No app store on this TV could open Shizuku. Download it from %1$s</string>
     <string name="grant_shizuku_sent">Accept the request on screen to finish.</string>
 

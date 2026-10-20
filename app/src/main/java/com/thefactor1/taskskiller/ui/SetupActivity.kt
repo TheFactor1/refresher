@@ -21,6 +21,7 @@ import com.thefactor1.taskskiller.kill.KillBackends
 import com.thefactor1.taskskiller.kill.ShizukuBackend
 import com.thefactor1.taskskiller.schedule.RestartScheduler
 import com.thefactor1.taskskiller.setup.ShizukuStarter
+import com.thefactor1.taskskiller.setup.ShizukuDownloader
 import com.thefactor1.taskskiller.status.Health
 import com.thefactor1.taskskiller.status.HealthReader
 import java.util.concurrent.Executors
@@ -103,7 +104,7 @@ class SetupActivity : AppCompatActivity() {
         val shizuku = binding.shizukuRow
         when {
             device.forceStopWithoutShizuku -> bindCheck(shizuku, true, getString(R.string.check_other_method, device.methodName), getString(R.string.check_shizuku_desc), null, null)
-            !device.shizukuInstalled -> bindCheck(shizuku, false, getString(R.string.check_shizuku_missing), getString(R.string.check_shizuku_desc), R.string.check_get) { openShizukuDownload() }
+            !device.shizukuInstalled -> bindCheck(shizuku, false, getString(R.string.check_shizuku_missing), getString(R.string.check_shizuku_desc), R.string.check_get) { getShizuku() }
             !device.shizukuRunning -> bindCheck(shizuku, false, getString(R.string.check_shizuku_stopped), getString(R.string.check_shizuku_desc), R.string.check_start) { startShizuku() }
             !device.shizukuPermitted -> bindCheck(shizuku, false, getString(R.string.check_shizuku_permission), getString(R.string.check_shizuku_desc), R.string.check_allow) {
                 ShizukuBackend.requestPermission()
@@ -311,6 +312,39 @@ class SetupActivity : AppCompatActivity() {
     private fun showResult(text: String) {
         binding.setupResult.text = text
         binding.setupResult.visibility = View.VISIBLE
+    }
+
+    /**
+     * Shizuku from its own GitHub releases, checked to be Rikka's signed build, then Android's installer.
+     * Google TV's Play says "not available for this device", so the store is only the fallback.
+     */
+    private fun getShizuku() {
+        if (busy) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !packageManager.canRequestPackageInstalls()) {
+            showResult(getString(R.string.shizuku_allow_installs))
+            open(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, appUri()))
+            return
+        }
+        busy = true
+        showResult(getString(R.string.shizuku_downloading))
+        worker.execute {
+            val got = ShizukuDownloader.download(applicationContext)
+            val installError = (got as? ShizukuDownloader.Result.Ready)?.let {
+                runCatching { ShizukuDownloader.install(applicationContext, it.file) }.exceptionOrNull()
+            }
+            runOnUiThread {
+                if (isFinishing || isDestroyed) return@runOnUiThread
+                busy = false
+                when {
+                    got is ShizukuDownloader.Result.Failed -> {
+                        showResult(getString(R.string.shizuku_download_failed, got.why))
+                        openShizukuDownload()
+                    }
+                    installError != null -> showResult(getString(R.string.shizuku_install_failed, installError.message ?: installError.javaClass.simpleName))
+                    got is ShizukuDownloader.Result.Ready -> showResult(getString(R.string.shizuku_confirm_install, got.version))
+                }
+            }
+        }
     }
 
     /** Play Store first; boxes without one may still have a browser for the releases page. */

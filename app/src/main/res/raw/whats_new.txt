@@ -1,3 +1,6 @@
+## 0.6.7
+Setup can now get Shizuku for you on TVs whose store doesn't offer it, like Google TV. Press Get: Refresher downloads Shizuku from its own GitHub page, checks it really is Shizuku signed by its developer, and opens the TV's installer for you to confirm. It's the only thing Refresher ever downloads.
+
 ## 0.6.6
 New in Setup: Privacy. It says plainly what Refresher can see and do (nothing leaves the TV). The boot receiver is also no longer reachable by other apps.
 

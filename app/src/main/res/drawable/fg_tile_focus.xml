@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Drawn over the banner: a clean white edge when focused, following the tile's rounded corners. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:enterFadeDuration="140" android:exitFadeDuration="140">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/radius_card" />
+            <stroke android:width="@dimen/focus_ring" android:color="@color/focus" />
+        </shape>
+    </item>
+    <item android:drawable="@android:color/transparent" />
+</selector>

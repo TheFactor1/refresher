@@ -1,13 +1,11 @@
 package com.thefactor1.taskskiller.ui
 
-import android.graphics.Outline
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewOutlineProvider
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -130,21 +128,13 @@ class AllAppsActivity : AppCompatActivity() {
 
         inner class Holder(val b: ItemHomeTileBinding) : RecyclerView.ViewHolder(b.root) {
             init {
-                val r = resources.getDimension(R.dimen.radius_card) - resources.getDimension(R.dimen.focus_ring)
-                b.tileBanner.clipToOutline = true
-                b.tileBanner.outlineProvider = object : ViewOutlineProvider() {
-                    override fun getOutline(view: View, outline: Outline) = outline.setRoundRect(0, 0, view.width, view.height, r)
-                }
-                b.tileCard.setOnFocusChangeListener { v, has ->
-                    val s = if (has) LIFT else 1f
-                    v.animate().scaleX(s).scaleY(s).translationZ(if (has) resources.displayMetrics.density * 8 else 0f).setDuration(140).start()
-                }
+                TileFocus.setUp(b.tileCard, HomeTheme.of(prefs.theme).accent)
+                b.tileCard.setOnFocusChangeListener { v, has -> TileFocus.lift(v, has) }
             }
         }
     }
 
     companion object {
         private const val COLUMNS = 6
-        private const val LIFT = 1.08f
     }
 }

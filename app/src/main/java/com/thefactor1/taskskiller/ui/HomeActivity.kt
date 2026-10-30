@@ -6,14 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.ColorStateList
-import android.graphics.Outline
 import android.os.Bundle
 import android.os.Environment
 import android.os.StatFs
 import android.text.format.DateFormat
 import android.view.KeyEvent
 import android.view.View
-import android.view.ViewOutlineProvider
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -91,7 +89,7 @@ class HomeActivity : AppCompatActivity() {
         binding.settingsChip.setOnClickListener { startActivity(Intent(this, HomeSettingsActivity::class.java)) }
         binding.allApps.setOnClickListener { startActivity(Intent(this, AllAppsActivity::class.java)) }
         binding.allApps.setOnFocusChangeListener { v, has ->
-            lift(v, has)
+            TileFocus.lift(v, has)
             if (has) binding.dockCaption.text = getString(R.string.home_all_apps)
         }
         binding.nowPlaying.setOnClickListener { playPause() }
@@ -142,6 +140,7 @@ class HomeActivity : AppCompatActivity() {
         val t = HomeTheme.of(prefs.theme)
         if (::theme.isInitialized && t == theme) return
         theme = t
+        shownKey = null
         binding.homeFrame.background = t.backdrop(resources.displayMetrics.widthPixels)
         window.statusBarColor = t.base
         binding.homeGreeting.setTextColor(t.accent)
@@ -268,11 +267,7 @@ class HomeActivity : AppCompatActivity() {
         b.tileCard.layoutParams = b.tileCard.layoutParams.apply {
             width = resources.getDimensionPixelSize(R.dimen.home_dock_tile_w); height = resources.getDimensionPixelSize(R.dimen.home_dock_tile_h)
         }
-        val r = resources.getDimension(R.dimen.radius_card) - resources.getDimension(R.dimen.focus_ring)
-        b.tileBanner.clipToOutline = true
-        b.tileBanner.outlineProvider = object : ViewOutlineProvider() {
-            override fun getOutline(view: View, outline: Outline) = outline.setRoundRect(0, 0, view.width, view.height, r)
-        }
+        TileFocus.setUp(b.tileCard, theme.accent)
         // The dock's caption names the focused app; an icon tile here is too short for its own label.
         b.tileIconName.visibility = View.GONE
         b.tileCard.contentDescription = app.label
@@ -282,7 +277,7 @@ class HomeActivity : AppCompatActivity() {
             if (keyCode == KeyEvent.KEYCODE_MENU && event.action == KeyEvent.ACTION_UP) { AppActions.options(this, app) { shownKey = null; render() }; true } else false
         }
         b.tileCard.setOnFocusChangeListener { v, has ->
-            lift(v, has)
+            TileFocus.lift(v, has)
             if (has) binding.dockCaption.text = if (noFavourites) getString(R.string.home_dock_hint, app.label) else app.label
         }
         TileImages.load(this, app.packageName, prefs.tileStyle) { img ->
@@ -292,12 +287,6 @@ class HomeActivity : AppCompatActivity() {
             b.tileIconBox.visibility = if (img.banner || img.d == null) View.GONE else View.VISIBLE
         }
         return b.root
-    }
-
-    /** Focus lifts a tile a little toward the viewer. */
-    private fun lift(v: View, up: Boolean) {
-        val z = resources.displayMetrics.density * 10
-        v.animate().scaleX(if (up) LIFT else 1f).scaleY(if (up) LIFT else 1f).translationZ(if (up) z else 0f).setDuration(LIFT_MS).start()
     }
 
     private fun cleanUp() {
@@ -324,8 +313,6 @@ class HomeActivity : AppCompatActivity() {
         private const val READ_MS = 30_000L
         private const val CPU_FRESH_MS = 3 * 60_000L
         private const val PLAY_SETTLE_MS = 600L
-        private const val LIFT_MS = 140L
-        private const val LIFT = 1.08f
 
         /** Test hook: where memory is read from. */
         internal var meminfo: () -> String = { File("/proc/meminfo").readText() }

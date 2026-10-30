@@ -284,8 +284,8 @@ class ScreensTest(private val fontScale: Float) {
                 centred(a, a.findViewById(R.id.homeClock)) + centred(a, a.findViewById(R.id.dock)) + centred(a, a.findViewById(R.id.meters)) +
                 (if (cards.size != 3) listOf("dock shows ${cards.size} favourites, not 3") else emptyList()) +
                 (if (cards.firstOrNull()?.hasFocus() != true) listOf("first favourite is not focused") else emptyList()) +
-                liftedInside(a, cards, 1.08f, a.findViewById(R.id.dock)) +
-                liftedInside(a, listOf(a.findViewById(R.id.allApps)), 1.08f, a.findViewById(R.id.dock))
+                liftedInside(a, cards, 1.1f, a.findViewById(R.id.dock)) +
+                liftedInside(a, listOf(a.findViewById(R.id.allApps)), 1.1f, a.findViewById(R.id.dock))
             shoot(a, "launcher-home")
             assertNoProblems("launcher-home", problems)
         } finally {
@@ -307,7 +307,7 @@ class ScreensTest(private val fontScale: Float) {
             (if (row == 0 || grid.height % row != 0) listOf("grid ${grid.height}px is not whole rows of ${row}px") else emptyList()) +
             (if (grid.height > area.height) listOf("grid is taller than its space") else emptyList()) +
             (if (cards.firstOrNull()?.hasFocus() != true) listOf("first app is not focused") else emptyList()) +
-            liftedInside(a, cards, 1.08f, grid)
+            liftedInside(a, cards, 1.1f, grid)
         shoot(a, "launcher-all-apps")
         assertNoProblems("launcher-all-apps", problems)
     }

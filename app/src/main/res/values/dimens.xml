@@ -20,4 +20,6 @@
     <dimen name="row_pad_h">18dp</dimen>
     <dimen name="row_pad_v">12dp</dimen>
     <dimen name="side_column">252dp</dimen>
+    <dimen name="home_fav_height">112dp</dimen>
+    <dimen name="home_app_height">72dp</dimen>
 </resources>

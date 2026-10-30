@@ -265,7 +265,7 @@ class ScreensTest(private val fontScale: Float) {
     // ---------- Home (the launcher) ----------
 
     @Test fun launcherHome() {
-        com.thefactor1.taskskiller.status.SystemReader.override = { systemSnapshot(struggling = false) }
+        HomeActivity.meminfo = { "MemTotal: 2000000 kB\nMemAvailable: 820000 kB\n" }
         com.thefactor1.taskskiller.home.HomePrefs.get(RuntimeEnvironment.getApplication()).favourites =
             listOf(Fixture.TIVI.pkg, Fixture.PLEX.pkg, Fixture.YOUTUBE.pkg)
         try {
@@ -273,10 +273,15 @@ class ScreensTest(private val fontScale: Float) {
             idleFor(600)
             val grid = a.findViewById<RecyclerView>(R.id.homeGrid)
             val cards = (0 until grid.childCount).mapNotNull { grid.getChildAt(it).findViewById<View>(R.id.tileCard) }
+            val favCards = cards.take(3)
+            val appCards = cards.drop(3)
             val chips = listOf(R.id.healthChip, R.id.cleanChip, R.id.refresherChip, R.id.settingsChip).map { a.findViewById<View>(it) }
-            val problems = common(a.window.decorView.findViewById(android.R.id.content), allowEllipsis = { it.id == R.id.tileName }) +
+            val problems = common(a.window.decorView.findViewById(android.R.id.content), allowEllipsis = { it.id == R.id.tileName || it.id == R.id.tileIconName }) +
                 LayoutCheck.leftAt(a.findViewById(R.id.homeClock), gutter) +
-                LayoutCheck.sameHeight("tiles", cards) +
+                LayoutCheck.sameHeight("favourite tiles", favCards) +
+                LayoutCheck.sameHeight("app tiles", appCards) +
+                (if (favCards.first().height <= appCards.first().height) listOf("favourites aren't bigger than apps") else emptyList()) +
+                liftedInside(a, favCards, 1.05f) + liftedInside(a, appCards, 1.08f) +
                 LayoutCheck.sameHeight("chips", chips) +
                 rightAtGutter(a.findViewById(R.id.settingsChip)) +
                 (if (cards.size < 5) listOf("only ${cards.size} tiles shown") else emptyList()) +
@@ -284,7 +289,7 @@ class ScreensTest(private val fontScale: Float) {
             shoot(a, "launcher-home")
             assertNoProblems("launcher-home", problems)
         } finally {
-            com.thefactor1.taskskiller.status.SystemReader.override = null
+            HomeActivity.meminfo = { java.io.File("/proc/meminfo").readText() }
         }
     }
 
@@ -323,6 +328,26 @@ class ScreensTest(private val fontScale: Float) {
 
     private fun common(root: View, allowEllipsis: (TextView) -> Boolean = { false }) =
         LayoutCheck.safeArea(root) + LayoutCheck.textFits(root, allowEllipsis) + LayoutCheck.noOverlaps(root)
+
+    /** A focused tile grows by [scale]: even then it must stay inside the screen's safe area and its grid (never cut off). */
+    private fun liftedInside(a: android.app.Activity, cards: List<View>, scale: Float): List<String> {
+        val root = a.window.decorView
+        val d = root.resources.displayMetrics.density
+        val safeX = root.width * 0.05f; val safeY = root.height * 0.05f
+        val grid = a.findViewById<View>(R.id.homeGrid)
+        val g = IntArray(2).also { grid.getLocationOnScreen(it) }
+        return cards.flatMap { c ->
+            // From the parent, so a tile that's already lifted isn't counted twice.
+            val p = IntArray(2).also { (c.parent as View).getLocationOnScreen(it) }.let { intArrayOf(it[0] + c.left, it[1] + c.top) }
+            val dx = c.width * (scale - 1) / 2; val dy = c.height * (scale - 1) / 2
+            val l = p[0] - dx; val r = p[0] + c.width + dx; val t = p[1] - dy
+            val name = c.contentDescription
+            listOfNotNull(
+                if (l < safeX || r > root.width - safeX) "$name lifted spans ${(l / d).toInt()}–${(r / d).toInt()}dp, outside the side safe area" else null,
+                if (l < g[0] || r > g[0] + grid.width || t < g[1]) "$name lifted is clipped by the grid" else null
+            )
+        }
+    }
 
     private fun rightAtGutter(v: View): List<String> {
         val screen = v.rootView.width

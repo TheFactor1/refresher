@@ -320,6 +320,26 @@
         <item quantity="one">%d app</item>
         <item quantity="other">%d apps</item>
     </plurals>
+    <string name="home_set_default">Home screen</string>
+    <string name="home_default_is">Refresher is the home screen. Select to give it back to the TV.</string>
+    <string name="home_default_not">The Home button opens %1$s. Select to make it open Refresher.</string>
+    <string name="home_default_not_unknown">Select to make the Home button open Refresher.</string>
+    <string name="home_default_lost">The TV took the Home button back. Select to set it again.</string>
+    <string name="home_default_projectivy">Projectivy\'s Home override is on and will still catch the Home button. Turn it off in Projectivy\'s settings.</string>
+    <string name="home_default_working">Working…</string>
+    <string name="home_default_done">Done: the Home button now opens Refresher.</string>
+    <string name="home_default_needs_shizuku">This needs Shizuku running (Refresher › Setup).</string>
+    <string name="home_default_stubborn_title">The TV keeps its own home screen</string>
+    <string name="home_default_stubborn">Android didn\'t let Refresher take the Home button. Refresher can turn off the TV\'s own home screen instead (%1$s). Its rows and recommendations are gone until you undo it here. Nothing is uninstalled.</string>
+    <string name="home_default_turn_off">Turn it off</string>
+    <string name="home_default_failed">Couldn\'t change the home screen. Nothing was turned off.</string>
+    <string name="home_default_undo_title">Give the Home button back?</string>
+    <string name="home_default_undo">The Home button goes back to %1$s%2$s.</string>
+    <string name="home_default_undo_tv">the TV\'s own home screen</string>
+    <string name="home_default_undo_reenable">, and the TV\'s own home screen is turned back on</string>
+    <string name="home_default_give_back">Give it back</string>
+    <string name="home_default_keep">Keep Refresher</string>
+    <string name="home_default_undone">The Home button opens the TV\'s own home screen again.</string>
     <string name="home_set_theme">Theme</string>
     <string name="home_set_theme_hint">Home\'s colours</string>
     <string name="home_theme_midnight">Midnight</string>

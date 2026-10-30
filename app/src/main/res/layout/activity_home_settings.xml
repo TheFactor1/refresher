@@ -26,6 +26,8 @@
         android:layout_marginTop="@dimen/space_l"
         android:layout_weight="1"
         android:clipToPadding="false"
+        android:fadingEdgeLength="72dp"
+        android:requiresFadingEdge="vertical"
         android:overScrollMode="never"
         android:scrollbars="none">
 
@@ -35,6 +37,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <include
+                android:id="@+id/defaultRow"
+                layout="@layout/row_link"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp" />
             <include
                 android:id="@+id/themeRow"
                 layout="@layout/row_value"

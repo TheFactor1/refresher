@@ -320,7 +320,7 @@ class ScreensTest(private val fontScale: Float) {
 
     @Test fun launcherSettings() {
         val a = launch(HomeSettingsActivity::class.java)
-        val rows = listOf(R.id.tilesRow, R.id.clockRow, R.id.healthRow, R.id.cleanRow, R.id.skipFavsRow).map { a.findViewById<View>(it) }
+        val rows = listOf(R.id.defaultRow, R.id.themeRow, R.id.tilesRow, R.id.clockRow, R.id.healthRow, R.id.cleanRow, R.id.skipFavsRow).map { a.findViewById<View>(it) }
         val problems = common(a.window.decorView.findViewById(android.R.id.content)) +
             LayoutCheck.sameLeft("settings rows", *rows.toTypedArray()) + LayoutCheck.leftAt(rows.first(), gutter) +
             LayoutCheck.sameRight("settings rows", *rows.toTypedArray()) + rightAtGutter(rows.first())

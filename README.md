@@ -16,9 +16,10 @@ and a dock of favourites with All apps beside it, in three colour themes.
 **Clean up** stops background apps over a size you choose, never the one on
 screen, a VPN, or music that's playing (scheduled refreshes skip playing apps
 too). Hold OK or press Menu on an app to favourite, move, hide, stop it or open
-its info. To use it as the TV's home screen, make it the default home app (on a
-Shield, that means disabling the stock launcher over ADB: `adb shell
-pm disable-user --user 0 com.google.android.tvlauncher`; `pm enable` undoes it).
+its info. To make it the TV's home screen, use **Home settings › Home screen**
+(needs Shizuku): Refresher first uses Android's own home-app setting; if the TV
+keeps its launcher anyway, it offers to turn the stock launcher off (never
+uninstalled), and the same row gives the Home button back and turns it on again.
 
 ## What it is, and what it can see
 

@@ -34,6 +34,21 @@ class HomePrefs private constructor(private val prefs: SharedPreferences) {
         get() = prefs.getBoolean(K_NOW_PLAYING, true)
         set(v) = prefs.edit().putBoolean(K_NOW_PLAYING, v).apply()
 
+    /** The viewer made Refresher the home screen (so Home settings can tell if the TV took it back). */
+    var wantsDefault: Boolean
+        get() = prefs.getBoolean(K_WANTS_DEFAULT, false)
+        set(v) = prefs.edit().putBoolean(K_WANTS_DEFAULT, v).apply()
+
+    /** What the Home button opened before Refresher took it (e.g. another launcher), to hand it back with Undo. */
+    var previousHome: String?
+        get() = prefs.getString(K_PREVIOUS_HOME, null)
+        set(v) = prefs.edit().putString(K_PREVIOUS_HOME, v).apply()
+
+    /** Stock launchers Refresher turned off, to turn back on with Undo. */
+    var turnedOff: Set<String>
+        get() = prefs.getStringSet(K_TURNED_OFF, emptySet()).orEmpty().toSet()
+        set(v) = prefs.edit().putStringSet(K_TURNED_OFF, v).apply()
+
     var showHealth: Boolean
         get() = prefs.getBoolean(K_HEALTH, true)
         set(v) = prefs.edit().putBoolean(K_HEALTH, v).apply()
@@ -70,6 +85,9 @@ class HomePrefs private constructor(private val prefs: SharedPreferences) {
         private const val K_CLOCK = "clock"
         private const val K_HEALTH = "health"
         private const val K_THEME = "theme"
+        private const val K_WANTS_DEFAULT = "wants_default"
+        private const val K_TURNED_OFF = "turned_off"
+        private const val K_PREVIOUS_HOME = "previous_home"
         private const val K_NOW_PLAYING = "now_playing"
         private const val K_CLEAN_MB = "cleanup_mb"
         private const val K_CLEAN_FAVS = "cleanup_skips_favourites"

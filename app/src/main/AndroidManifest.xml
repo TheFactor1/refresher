@@ -120,6 +120,48 @@
             android:name=".ui.SetupActivity"
             android:exported="false" />
 
+        <!-- Refresher Home: a launcher. Android uses it as the home screen once it is the only (or chosen) one. -->
+
+        <activity
+
+            android:name=".ui.HomeActivity"
+
+            android:exported="true"
+
+            android:label="@string/home_label"
+
+            android:launchMode="singleTask"
+
+            android:stateNotNeeded="true"
+
+            android:excludeFromRecents="true"
+
+            android:clearTaskOnLaunch="true"
+
+            android:resumeWhilePausing="true"
+
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout|uiMode">
+
+            <intent-filter>
+
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.HOME" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+            </intent-filter>
+
+        </activity>
+
+
+        <activity
+
+            android:name=".ui.HomeSettingsActivity"
+
+            android:exported="false" />
+
+
         <activity
 
             android:name=".ui.SystemActivity"

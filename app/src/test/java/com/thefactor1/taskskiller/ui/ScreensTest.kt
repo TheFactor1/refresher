@@ -262,6 +262,42 @@ class ScreensTest(private val fontScale: Float) {
         }
     }
 
+    // ---------- Home (the launcher) ----------
+
+    @Test fun launcherHome() {
+        com.thefactor1.taskskiller.status.SystemReader.override = { systemSnapshot(struggling = false) }
+        com.thefactor1.taskskiller.home.HomePrefs.get(RuntimeEnvironment.getApplication()).favourites =
+            listOf(Fixture.TIVI.pkg, Fixture.PLEX.pkg, Fixture.YOUTUBE.pkg)
+        try {
+            val a = launch(HomeActivity::class.java)
+            idleFor(600)
+            val grid = a.findViewById<RecyclerView>(R.id.homeGrid)
+            val cards = (0 until grid.childCount).mapNotNull { grid.getChildAt(it).findViewById<View>(R.id.tileCard) }
+            val chips = listOf(R.id.healthChip, R.id.cleanChip, R.id.refresherChip, R.id.settingsChip).map { a.findViewById<View>(it) }
+            val problems = common(a.window.decorView.findViewById(android.R.id.content), allowEllipsis = { it.id == R.id.tileName }) +
+                LayoutCheck.leftAt(a.findViewById(R.id.homeClock), gutter) +
+                LayoutCheck.sameHeight("tiles", cards) +
+                LayoutCheck.sameHeight("chips", chips) +
+                rightAtGutter(a.findViewById(R.id.settingsChip)) +
+                (if (cards.size < 5) listOf("only ${cards.size} tiles shown") else emptyList()) +
+                (if (cards.firstOrNull()?.hasFocus() != true) listOf("first favourite is not focused") else emptyList())
+            shoot(a, "launcher-home")
+            assertNoProblems("launcher-home", problems)
+        } finally {
+            com.thefactor1.taskskiller.status.SystemReader.override = null
+        }
+    }
+
+    @Test fun launcherSettings() {
+        val a = launch(HomeSettingsActivity::class.java)
+        val rows = listOf(R.id.tilesRow, R.id.clockRow, R.id.healthRow, R.id.cleanRow, R.id.skipFavsRow).map { a.findViewById<View>(it) }
+        val problems = common(a.window.decorView.findViewById(android.R.id.content)) +
+            LayoutCheck.sameLeft("settings rows", *rows.toTypedArray()) + LayoutCheck.leftAt(rows.first(), gutter) +
+            LayoutCheck.sameRight("settings rows", *rows.toTypedArray()) + rightAtGutter(rows.first())
+        shoot(a, "launcher-settings")
+        assertNoProblems("launcher-settings", problems)
+    }
+
     // ---------- Setup ----------
 
     @Test fun setupHealthy() = checkSetup("setup-healthy")

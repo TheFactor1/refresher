@@ -1,3 +1,6 @@
+## 0.7.0
+New: Refresher Home, a light launcher. A clock, how the TV is doing, Clean up (stops background apps over a size you choose, never the one on screen or your VPN), and your apps with favourites first. Hold OK or press Menu on an app to favourite, move, hide, stop it or see its info. Home settings has the rest.
+
 ## 0.6.9
 System now shows the last hour: memory and processor as two lines, and the worst moment named under them, with the app that was using the most memory then. It takes one reading a minute while the TV is on, keeps only the last hour on the TV, and never wakes a sleeping TV.
 

@@ -20,8 +20,11 @@ import java.util.concurrent.Executors
  */
 object TileImages {
 
-    /** A tile image: the TV banner, or the icon when the app has none (or icons are chosen). */
-    class Img(val d: Drawable?, val banner: Boolean, val bytes: Int)
+    /**
+     * A tile image: the TV banner, or the icon when the app has none (or icons are chosen). Also the app's colour
+     * and, for banners, a tiny blurred copy that Home stretches across the screen behind everything.
+     */
+    class Img(val d: Drawable?, val banner: Boolean, val bytes: Int, val color: Int?, val art: Bitmap?)
 
     private val worker = Executors.newSingleThreadExecutor()
     private val main = Handler(Looper.getMainLooper())
@@ -40,7 +43,9 @@ object TileImages {
         worker.execute {
             val banner = if (tiles == HomePrefs.TileStyle.BANNERS) runCatching { bannerThumb(app, pkg) }.getOrNull() else null
             val bmp = banner ?: runCatching { app.packageManager.getApplicationIcon(pkg) }.getOrNull()?.let { thumbnail(app, it, ICON_PX, ICON_PX, crop = false) }
-            val img = Img(bmp?.let { BitmapDrawable(app.resources, it) }, banner != null, bmp?.byteCount ?: 1)
+            val color = bmp?.let { Ambience.colorOf(it) }
+            val art = banner?.let { Ambience.artOf(it) }
+            val img = Img(bmp?.let { BitmapDrawable(app.resources, it) }, banner != null, (bmp?.byteCount ?: 1) + (art?.byteCount ?: 0), color, art)
             main.post { cache.put(pkg, img); done(img) }
         }
     }

@@ -292,6 +292,9 @@
     <string name="home_meter_cpu">PROCESSOR</string>
     <string name="home_meter_storage">STORAGE</string>
     <string name="home_meter_free">%1$d%% free</string>
+    <string name="home_halo_free">%1$d%% memory free</string>
+    <string name="home_storage_free">%1$s free</string>
+    <string name="home_open_hint">%1$s  ·  OK to open</string>
     <string name="home_meter_unknown">–</string>
     <string name="home_cpu_calm">Calm</string>
     <string name="home_cpu_busy">Busy</string>

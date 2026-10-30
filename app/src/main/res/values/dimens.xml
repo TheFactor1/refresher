@@ -22,8 +22,9 @@
     <dimen name="side_column">252dp</dimen>
     <dimen name="home_app_height">72dp</dimen>
     <dimen name="home_tile_pad">8dp</dimen>
-    <dimen name="home_meter_width">132dp</dimen>
     <dimen name="home_dock_gap">10dp</dimen>
     <dimen name="home_dock_tile_w">108dp</dimen>
     <dimen name="home_dock_tile_h">61dp</dimen>
+    <dimen name="home_halo">270dp</dimen>
+    <dimen name="home_stat_width">120dp</dimen>
 </resources>

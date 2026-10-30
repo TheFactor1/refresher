@@ -19,7 +19,7 @@ import androidx.core.content.ContextCompat
 import com.thefactor1.taskskiller.R
 import com.thefactor1.taskskiller.databinding.ActivityHomeBinding
 import com.thefactor1.taskskiller.databinding.ItemHomeTileBinding
-import com.thefactor1.taskskiller.databinding.ViewHomeMeterBinding
+import com.thefactor1.taskskiller.home.Backdrop
 import com.thefactor1.taskskiller.home.CleanUp
 import com.thefactor1.taskskiller.home.HomeLogic
 import com.thefactor1.taskskiller.home.HomePrefs
@@ -38,15 +38,21 @@ import java.util.Date
 import java.util.concurrent.Executors
 
 /**
- * Refresher Home, the launcher: a big clock, the TV's health in three meters, what's playing, and a dock of
- * favourites with All apps beside it. One screen, nothing scrolls. Built to stay light: plain views, six small
- * tile images, the app list read only when apps change, and readings every 30 s only while Home is showing.
+ * Refresher Home, the launcher, "cinema": the selected app's art fills the screen, the clock sits in a halo that
+ * shows free memory, and a dock holds favourites and All apps. One screen, nothing scrolls. Built to stay light:
+ * plain views and drawables, six small tile images (the backdrop art is a 32x18 copy), the app list read only
+ * when apps change, readings every 30 s only while Home is showing, and nothing animating while it sits still.
  */
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var prefs: HomePrefs
     private lateinit var theme: HomeTheme
+    private lateinit var backdrop: Backdrop
+    /** The selected app's colour (the theme's accent for greys and All apps). */
+    private var focusColor = 0
+    private var level = Level.OK
+    private var haloShown = false
     private val worker = Executors.newSingleThreadExecutor()
     private var apps: List<HomeLogic.App>? = null
     private var appsDirty = true
@@ -80,17 +86,19 @@ class HomeActivity : AppCompatActivity() {
         setContentView(binding.root)
         prefs = HomePrefs.get(this)
 
-        binding.memMeter.meterLabel.setText(R.string.home_meter_memory)
-        binding.cpuMeter.meterLabel.setText(R.string.home_meter_cpu)
-        binding.diskMeter.meterLabel.setText(R.string.home_meter_storage)
+        binding.cpuStat.statLabel.setText(R.string.home_meter_cpu)
+        binding.cpuStat.statLabel.gravity = android.view.Gravity.END
+        binding.cpuStat.statValue.gravity = android.view.Gravity.END
+        binding.diskStat.statLabel.setText(R.string.home_meter_storage)
 
-        binding.healthChip.setOnClickListener { startActivity(Intent(this, SystemActivity::class.java)) }
+        binding.halo.setOnClickListener { startActivity(Intent(this, SystemActivity::class.java)) }
         binding.cleanChip.setOnClickListener { cleanUp() }
         binding.settingsChip.setOnClickListener { startActivity(Intent(this, HomeSettingsActivity::class.java)) }
         binding.allApps.setOnClickListener { startActivity(Intent(this, AllAppsActivity::class.java)) }
         binding.allApps.setOnFocusChangeListener { v, has ->
-            TileFocus.lift(v, has)
-            if (has) binding.dockCaption.text = getString(R.string.home_all_apps)
+            TileFocus.lift(v, has, DOCK_LIFT)
+            if (has) select(getString(R.string.home_all_apps), null, null)
+            dim()
         }
         binding.nowPlaying.setOnClickListener { playPause() }
 
@@ -111,11 +119,21 @@ class HomeActivity : AppCompatActivity() {
             addAction(Intent.ACTION_TIME_TICK); addAction(Intent.ACTION_TIME_CHANGED); addAction(Intent.ACTION_TIMEZONE_CHANGED)
         })
         showClock()
-        val health = if (prefs.showHealth) View.VISIBLE else View.GONE
-        binding.healthChip.visibility = health
-        binding.meters.visibility = health
+        val health = if (prefs.showHealth) View.VISIBLE else View.INVISIBLE
+        binding.halo.visibility = health
+        binding.haloText.visibility = health
+        binding.cpuStat.root.visibility = health
+        binding.diskStat.root.visibility = health
         binding.root.post(readings)
         if (appsDirty || apps == null) loadApps() else render()
+    }
+
+    /** Home eases in when you come back to it. */
+    override fun onStart() {
+        super.onStart()
+        binding.homeRoot.alpha = 0f
+        binding.homeRoot.translationY = resources.displayMetrics.density * 14
+        binding.homeRoot.animate().alpha(1f).translationY(0f).setDuration(ENTER_MS).start()
     }
 
     override fun onPause() {
@@ -141,11 +159,43 @@ class HomeActivity : AppCompatActivity() {
         if (::theme.isInitialized && t == theme) return
         theme = t
         shownKey = null
-        binding.homeFrame.background = t.backdrop(resources.displayMetrics.widthPixels)
+        backdrop = Backdrop(resources, t)
+        binding.homeFrame.background = backdrop.drawable
         window.statusBarColor = t.base
-        binding.homeGreeting.setTextColor(t.accent)
-        binding.homeClock.setShadowLayer(48f, 0f, 8f, t.accentAt(0x55))
-        listOf(binding.memMeter, binding.cpuMeter, binding.diskMeter).forEach { it.meterFill.backgroundTintList = ColorStateList.valueOf(t.accent) }
+        tint(t.accent)
+    }
+
+    /** The selected app's colour on the halo, its text and the clock's glow. */
+    private fun tint(color: Int) {
+        focusColor = color
+        val ring = when (level) {
+            Level.OK -> color
+            Level.WARN -> ContextCompat.getColor(this, R.color.warn)
+            Level.BAD -> ContextCompat.getColor(this, R.color.bad)
+        }
+        binding.halo.color = ring
+        // Half way to white, so it reads over any backdrop.
+        binding.haloText.setTextColor(androidx.core.graphics.ColorUtils.blendARGB(ring, android.graphics.Color.WHITE, 0.5f))
+        binding.homeClock.setShadowLayer(56f, 0f, 0f, android.graphics.Color.argb(0x73, android.graphics.Color.red(color), android.graphics.Color.green(color), android.graphics.Color.blue(color)))
+    }
+
+    /** Something in the dock was selected: its name below, its art and colour everywhere else. */
+    private fun select(label: String, img: TileImages.Img?, hint: String?) {
+        binding.dockCaption.text = hint ?: getString(R.string.home_open_hint, label)
+        val color = img?.color ?: theme.accent
+        backdrop.show(img?.art, color)
+        tint(color)
+    }
+
+    /** While the dock has focus, the apps not selected step back a little. */
+    private fun dim() {
+        binding.dock.post {
+            val inDock = binding.dock.hasFocus()
+            for (i in 0 until binding.dockApps.childCount) {
+                val card = binding.dockApps.getChildAt(i).findViewById<View>(R.id.tileCard)
+                card.animate().alpha(if (!inDock || card.isFocused) 1f else DIMMED).setDuration(160).start()
+            }
+        }
     }
 
     private fun showClock() {
@@ -157,8 +207,8 @@ class HomeActivity : AppCompatActivity() {
         }
         binding.homeClock.text = DateFormat.format(pattern, now)
         val locale = resources.configuration.locales[0]
-        binding.homeDate.text = DateFormat.format(DateFormat.getBestDateTimePattern(locale, "EEEEMMMMd"), now).toString()
-            .replace(", ", " · ").uppercase(locale)
+        binding.homeDate.text = (DateFormat.format("EEE", now).toString() + " · " +
+            DateFormat.format(DateFormat.getBestDateTimePattern(locale, "MMMd"), now)).uppercase(locale)
         binding.homeGreeting.setText(greeting(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)))
     }
 
@@ -179,32 +229,19 @@ class HomeActivity : AppCompatActivity() {
             runOnUiThread {
                 if (isFinishing || isDestroyed) return@runOnUiThread
                 if (total != null && avail != null && total > 0) {
-                    val level = when { avail * 100 < total * 12 -> Level.BAD; avail * 100 < total * 30 -> Level.WARN; else -> Level.OK }
-                    showHealth(level, SystemStats.size(avail))
-                    meter(binding.memMeter, (avail * 100 / total).toInt(), getString(R.string.home_meter_free, (avail * 100 / total).toInt()))
+                    level = when { avail * 100 < total * 12 -> Level.BAD; avail * 100 < total * 30 -> Level.WARN; else -> Level.OK }
+                    val pct = (avail * 100 / total).toInt()
+                    binding.halo.setFraction(pct / 100f, animate = !haloShown)
+                    haloShown = true
+                    binding.haloText.text = getString(R.string.home_halo_free, pct)
+                    binding.halo.contentDescription = getString(R.string.home_halo_free, pct)
+                    tint(focusColor)
                 }
-                if (cpu != null) meter(binding.cpuMeter, cpu, getString(cpuWord(cpu)))
-                else meter(binding.cpuMeter, 0, getString(R.string.home_meter_unknown))
-                if (disk != null && disk.totalBytes > 0) meter(binding.diskMeter, (disk.availableBytes * 100 / disk.totalBytes).toInt(), SystemStats.size(disk.availableBytes / 1024))
+                binding.cpuStat.statValue.text = if (cpu != null) getString(cpuWord(cpu)) else getString(R.string.home_meter_unknown)
+                if (disk != null && disk.totalBytes > 0) binding.diskStat.statValue.text = getString(R.string.home_storage_free, SystemStats.size(disk.availableBytes / 1024))
                 showPlaying(playing?.let { NowPlaying.pick(it, pausedHere) })
             }
         }
-    }
-
-    private fun meter(m: ViewHomeMeterBinding, pct: Int, value: String) {
-        m.meterValue.text = value
-        val w = resources.getDimensionPixelSize(R.dimen.home_meter_width)
-        m.meterFill.layoutParams = m.meterFill.layoutParams.apply { width = w * pct.coerceIn(0, 100) / 100 }
-    }
-
-    private fun showHealth(level: Level, free: String) {
-        val (dot, text) = when (level) {
-            Level.OK -> theme.accent to R.string.home_health_ok
-            Level.WARN -> ContextCompat.getColor(this, R.color.warn) to R.string.home_health_warn
-            Level.BAD -> ContextCompat.getColor(this, R.color.bad) to R.string.home_health_bad
-        }
-        binding.healthDot.backgroundTintList = ColorStateList.valueOf(dot)
-        binding.healthText.text = getString(R.string.home_health, getString(text), free)
     }
 
     private fun showPlaying(s: NowPlaying.Session?) {
@@ -277,10 +314,13 @@ class HomeActivity : AppCompatActivity() {
             if (keyCode == KeyEvent.KEYCODE_MENU && event.action == KeyEvent.ACTION_UP) { AppActions.options(this, app) { shownKey = null; render() }; true } else false
         }
         b.tileCard.setOnFocusChangeListener { v, has ->
-            TileFocus.lift(v, has)
-            if (has) binding.dockCaption.text = if (noFavourites) getString(R.string.home_dock_hint, app.label) else app.label
+            TileFocus.lift(v, has, DOCK_LIFT)
+            if (has) select(app.label, TileImages.cached(app.packageName), if (noFavourites) getString(R.string.home_dock_hint, app.label) else null)
+            dim()
         }
         TileImages.load(this, app.packageName, prefs.tileStyle) { img ->
+            img.color?.let { b.tileCard.outlineSpotShadowColor = it; b.tileCard.outlineAmbientShadowColor = it }
+            if (b.tileCard.isFocused) select(app.label, img, if (noFavourites) getString(R.string.home_dock_hint, app.label) else null)
             b.tileBanner.setImageDrawable(if (img.banner) img.d else null)
             b.tileIcon.setImageDrawable(if (img.banner) null else img.d)
             b.tileBanner.visibility = if (img.banner) View.VISIBLE else View.GONE
@@ -310,6 +350,9 @@ class HomeActivity : AppCompatActivity() {
 
     companion object {
         private const val DOCK_SIZE = 6
+        private const val DOCK_LIFT = 1.12f
+        private const val DIMMED = 0.62f
+        private const val ENTER_MS = 260L
         private const val READ_MS = 30_000L
         private const val CPU_FRESH_MS = 3 * 60_000L
         private const val PLAY_SETTLE_MS = 600L

@@ -273,19 +273,17 @@ class ScreensTest(private val fontScale: Float) {
             idleFor(600)
             val dock = a.findViewById<android.view.ViewGroup>(R.id.dockApps)
             val cards = (0 until dock.childCount).map { dock.getChildAt(it).findViewById<View>(R.id.tileCard) }
-            val chips = listOf(R.id.healthChip, R.id.cleanChip, R.id.settingsChip).map { a.findViewById<View>(it) }
-            val meters = listOf(R.id.memMeter, R.id.cpuMeter, R.id.diskMeter).map { a.findViewById<View>(it) }
+            val chips = listOf(R.id.cleanChip, R.id.settingsChip).map { a.findViewById<View>(it) }
             val problems = common(a.window.decorView.findViewById(android.R.id.content), allowEllipsis = { it.id == R.id.tileIconName }) +
                 LayoutCheck.leftAt(a.findViewById(R.id.homeGreeting), gutter) +
                 LayoutCheck.sameHeight("dock tiles", cards) +
                 LayoutCheck.sameHeight("chips", chips) +
-                LayoutCheck.sameHeight("meters", meters) +
                 rightAtGutter(a.findViewById(R.id.settingsChip)) +
-                centred(a, a.findViewById(R.id.homeClock)) + centred(a, a.findViewById(R.id.dock)) + centred(a, a.findViewById(R.id.meters)) +
+                centred(a, a.findViewById(R.id.homeClock)) + centred(a, a.findViewById(R.id.halo)) + centred(a, a.findViewById(R.id.dock)) +
                 (if (cards.size != 3) listOf("dock shows ${cards.size} favourites, not 3") else emptyList()) +
                 (if (cards.firstOrNull()?.hasFocus() != true) listOf("first favourite is not focused") else emptyList()) +
-                liftedInside(a, cards, 1.1f, a.findViewById(R.id.dock)) +
-                liftedInside(a, listOf(a.findViewById(R.id.allApps)), 1.1f, a.findViewById(R.id.dock))
+                liftedInside(a, cards, 1.12f, a.findViewById(R.id.homeRoot)) +
+                liftedInside(a, listOf(a.findViewById(R.id.allApps)), 1.12f, a.findViewById(R.id.homeRoot))
             shoot(a, "launcher-home")
             assertNoProblems("launcher-home", problems)
         } finally {

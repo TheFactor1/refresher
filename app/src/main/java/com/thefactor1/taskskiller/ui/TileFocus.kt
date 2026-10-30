@@ -16,8 +16,11 @@ object TileFocus {
         card.outlineAmbientShadowColor = glow
     }
 
-    fun lift(v: View, up: Boolean) {
-        val z = v.resources.displayMetrics.density * 14
-        v.animate().scaleX(if (up) LIFT else 1f).scaleY(if (up) LIFT else 1f).translationZ(if (up) z else 0f).setDuration(MS).start()
+    /** Lifts [v] by [scale]; past the standard lift it also rises a little, like the dock's selected app. */
+    fun lift(v: View, up: Boolean, scale: Float = LIFT) {
+        val d = v.resources.displayMetrics.density
+        val rise = if (scale > LIFT) -6 * d else 0f
+        v.animate().scaleX(if (up) scale else 1f).scaleY(if (up) scale else 1f).translationZ(if (up) 16 * d else 0f)
+            .translationY(if (up) rise else 0f).setDuration(MS).start()
     }
 }

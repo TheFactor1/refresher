@@ -127,6 +127,8 @@
             android:layout_weight="1"
             android:clipChildren="false"
             android:clipToPadding="false"
+            android:fadingEdgeLength="@dimen/space_l"
+            android:requiresFadingEdge="vertical"
             android:overScrollMode="never"
             android:paddingTop="4dp"
             android:paddingBottom="@dimen/space_l"

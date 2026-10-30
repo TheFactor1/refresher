@@ -365,17 +365,10 @@ class HomeActivity : AppCompatActivity() {
         private fun load(b: ItemHomeTileBinding, pkg: String) {
             val wantBanner = style == HomePrefs.TileStyle.BANNERS
             images.execute {
-                val pm = packageManager
-                val banner: Drawable? = if (!wantBanner) null else runCatching {
-                    PackageUtil.launchIntent(this@HomeActivity, pkg)?.let { pm.getActivityBanner(it) } ?: pm.getApplicationBanner(pkg)
-                }.getOrNull()
-                val icon: Drawable? = if (banner != null) null else runCatching { pm.getApplicationIcon(pkg) }.getOrNull()
-                // Apps ship banners up to 1280x720 and icons at 512 px: keep only a tile-sized copy.
-                val bmp = when {
-                    banner != null -> thumbnail(banner, BANNER_W, BANNER_H, crop = true)
-                    icon != null -> thumbnail(icon, ICON_PX, ICON_PX, crop = false)
-                    else -> null
-                }
+                // Apps ship banners up to 1280x720 and icons at 512 px: keep only a tile-sized copy, and decode
+                // straight to that size when the image is a plain bitmap so the full-size one never exists.
+                val banner = if (wantBanner) runCatching { bannerThumb(pkg) }.getOrNull() else null
+                val bmp = banner ?: runCatching { packageManager.getApplicationIcon(pkg) }.getOrNull()?.let { thumbnail(it, ICON_PX, ICON_PX, crop = false) }
                 val img = Img(bmp?.let { BitmapDrawable(resources, it) }, banner != null, bmp?.let { washOf(it) } ?: washColor, bmp?.byteCount ?: 1)
                 runOnUiThread {
                     if (isDestroyed) return@runOnUiThread
@@ -397,6 +390,30 @@ class HomeActivity : AppCompatActivity() {
             // An icon alone on a card looks lost: wash the card in the icon's own colour.
             b.tileIconBox.background = if (img != null && !banner) iconWash(img.wash) else null
         }
+    }
+
+    /** The app's TV banner at tile size, or null if it has none. */
+    private fun bannerThumb(pkg: String): Bitmap? {
+        val pm = packageManager
+        val activity = PackageUtil.launchIntent(this, pkg)?.let { pm.resolveActivity(it, 0)?.activityInfo }
+        val app = activity?.applicationInfo ?: pm.getApplicationInfo(pkg, 0)
+        val res = activity?.banner?.takeIf { it != 0 } ?: app.banner.takeIf { it != 0 } ?: return null
+        val small = runCatching {
+            val source = android.graphics.ImageDecoder.createSource(pm.getResourcesForApplication(app), res)
+            android.graphics.ImageDecoder.decodeBitmap(source) { decoder, info, _ ->
+                val scale = maxOf(BANNER_W / info.size.width.toFloat(), BANNER_H / info.size.height.toFloat()).coerceAtMost(1f)
+                decoder.setTargetSize((info.size.width * scale).toInt().coerceAtLeast(1), (info.size.height * scale).toInt().coerceAtLeast(1))
+                decoder.allocator = android.graphics.ImageDecoder.ALLOCATOR_SOFTWARE
+            }
+        }.getOrNull()
+        if (small != null) {
+            val thumb = thumbnail(BitmapDrawable(resources, small), BANNER_W, BANNER_H, crop = true)
+            small.recycle()
+            return thumb
+        }
+        // Not a plain image (a vector or layered drawable): small to draw anyway.
+        val d = (activity?.loadBanner(pm) ?: pm.getApplicationBanner(app)) ?: return null
+        return thumbnail(d, BANNER_W, BANNER_H, crop = true)
     }
 
     /**

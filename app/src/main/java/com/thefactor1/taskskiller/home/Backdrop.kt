@@ -5,18 +5,16 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
-import android.graphics.Shader
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
 import android.graphics.drawable.TransitionDrawable
-import kotlin.random.Random
 
 /**
  * Home's "cinema" backdrop, back to front: the theme's deep base and glows, the selected app's art (its banner,
- * tiny and blurred, stretched past the edges), a dark vignette and a dark floor for the dock, then a faint grain.
+ * tiny and blurred, stretched past the edges), a dark vignette and a dark floor for the dock.
  * Plain drawables: drawn once per change, nothing runs while Home sits still.
  */
 class Backdrop(private val res: Resources, private val theme: HomeTheme) {
@@ -36,7 +34,7 @@ class Backdrop(private val res: Resources, private val theme: HomeTheme) {
             colors = intArrayOf(0x6604060B, 0x9904060B.toInt(), 0xE604060B.toInt())
         }
         val floor = GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP, intArrayOf(0xEB04060B.toInt(), 0x0004060B))
-        layers = LayerDrawable(arrayOf(theme.backdrop(w), art, vignette, floor, grain()))
+        layers = LayerDrawable(arrayOf(theme.backdrop(w), art, vignette, floor))
         layers.setId(ART, ART)
         // The art bleeds past every edge, so the blur never shows a hard border.
         val bleedX = (w * 0.12f).toInt(); val bleedY = (h * 0.12f).toInt()
@@ -71,14 +69,6 @@ class Backdrop(private val res: Resources, private val theme: HomeTheme) {
         fade.startTransition(FADE_MS)
     }
 
-    /** A faint film grain: one small random tile, repeated. */
-    private fun grain(): Drawable {
-        val size = 128
-        val rnd = Random(7)
-        val px = IntArray(size * size) { if (rnd.nextBoolean()) Color.argb(rnd.nextInt(10, 22), 255, 255, 255) else Color.argb(rnd.nextInt(10, 26), 0, 0, 0) }
-        val bmp = Bitmap.createBitmap(px, size, size, Bitmap.Config.ARGB_8888)
-        return BitmapDrawable(res, bmp).apply { setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT) }
-    }
 
     companion object {
         private const val ART = 1

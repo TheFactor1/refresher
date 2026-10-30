@@ -367,9 +367,18 @@ class ScreensTest(private val fontScale: Float) {
             val dx = c.width * (scale - 1) / 2; val dy = c.height * (scale - 1) / 2
             val l = p[0] - dx; val r = p[0] + c.width + dx; val t = p[1] - dy; val b = p[1] + c.height + dy
             val name = c.contentDescription
+            // Every ancestor that clips its children must have room for the lifted tile, or the TV cuts it square.
+            val clippedBy = generateSequence(c.parent as? android.view.ViewGroup) { it.parent as? android.view.ViewGroup }
+                .drop(1) // the tile's own row: its padding is the room
+                .filter { it.clipChildren }
+                .firstOrNull { pv ->
+                    val q = IntArray(2).also { pv.getLocationOnScreen(it) }
+                    l < q[0] - 0.5f || r > q[0] + pv.width + 0.5f || t < q[1] - 0.5f || b > q[1] + pv.height + 0.5f
+                }
             listOfNotNull(
                 if (l < safeX || r > root.width - safeX) "$name lifted spans ${(l / d).toInt()}–${(r / d).toInt()}dp, outside the side safe area" else null,
-                if (l < g[0] || r > g[0] + grid.width || t < g[1] || b > g[1] + grid.height) "$name lifted is clipped by its container" else null
+                if (l < g[0] || r > g[0] + grid.width || t < g[1] || b > g[1] + grid.height) "$name lifted is clipped by its container" else null,
+                clippedBy?.let { "$name lifted is cut off by ${if (it.id > 0) it.resources.getResourceEntryName(it.id) else it.javaClass.simpleName}" }
             )
         }
     }

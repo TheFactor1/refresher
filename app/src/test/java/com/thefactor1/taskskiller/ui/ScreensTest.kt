@@ -238,8 +238,9 @@ class ScreensTest(private val fontScale: Float) {
         com.thefactor1.taskskiller.status.SystemHistory.override = { systemHour(struggling) }
         try {
             val a = launch(SystemActivity::class.java)
-            idleFor(400)
             val list = a.findViewById<RecyclerView>(R.id.appList)
+            // The app list is read on a background thread: wait for it (up to 5 s) rather than a fixed time.
+            idleUntil(5_000) { list.childCount > 0 && list.getChildAt(0).hasFocus() }
             val rows = (0 until list.childCount).map { list.getChildAt(it) }
             val meters = listOf(R.id.memMeter, R.id.swapMeter, R.id.cpuMeter, R.id.storageMeter).map { a.findViewById<View>(it) }
             val problems = common(a.window.decorView.findViewById(android.R.id.content)) +
@@ -396,6 +397,16 @@ class ScreensTest(private val fontScale: Float) {
             idleFor(20)
         }
         idleFor(200)
+    }
+
+    /** Runs the main thread until [done], letting background threads finish, for at most [maxMs] of real time. */
+    private fun idleUntil(maxMs: Long, done: () -> Boolean) {
+        val end = System.currentTimeMillis() + maxMs
+        idleFor(400)
+        while (!done() && System.currentTimeMillis() < end) {
+            Thread.sleep(25)
+            idleFor(50)
+        }
     }
 
     private fun idleFor(ms: Long) {

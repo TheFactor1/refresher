@@ -24,6 +24,7 @@ import com.thefactor1.taskskiller.home.CleanUp
 import com.thefactor1.taskskiller.home.HomeLogic
 import com.thefactor1.taskskiller.home.HomePrefs
 import com.thefactor1.taskskiller.home.HomeTheme
+import com.thefactor1.taskskiller.home.NetStatus
 import com.thefactor1.taskskiller.home.NowPlaying
 import com.thefactor1.taskskiller.home.TileImages
 import com.thefactor1.taskskiller.kill.KillBackends
@@ -53,6 +54,16 @@ class HomeActivity : AppCompatActivity() {
     private var focusColor = 0
     private var level = Level.OK
     private var haloShown = false
+    /** The VPN app's name when exactly one is installed (else the status just says "VPN on"). */
+    private var vpnName: String? = null
+
+    /** Network changes (Wi-Fi drops, the VPN connects): Android tells Home, so nothing polls. */
+    private val netCallback = object : android.net.ConnectivityManager.NetworkCallback() {
+        override fun onAvailable(network: android.net.Network) = netChanged()
+        override fun onLost(network: android.net.Network) = netChanged()
+        override fun onCapabilitiesChanged(network: android.net.Network, caps: android.net.NetworkCapabilities) = netChanged()
+    }
+    private val readNetNow = Runnable { readNet() }
     private val worker = Executors.newSingleThreadExecutor()
     private var apps: List<HomeLogic.App>? = null
     private var appsDirty = true
@@ -76,6 +87,7 @@ class HomeActivity : AppCompatActivity() {
     private val readings = object : Runnable {
         override fun run() {
             readHealth()
+            readNet()
             binding.root.postDelayed(this, READ_MS)
         }
     }
@@ -128,12 +140,31 @@ class HomeActivity : AppCompatActivity() {
         if (appsDirty || apps == null) loadApps() else render()
     }
 
+    /** Home starts on the first app in the dock, once the window can take focus and the dock is filled. */
+    private fun focusDock() {
+        if (!hasWindowFocus() || binding.dockApps.childCount == 0) return
+        focusedOnce = true
+        binding.dockApps.getChildAt(0).findViewById<View>(R.id.tileCard).requestFocus()
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus && !focusedOnce) focusDock()
+    }
+
     /** Home eases in when you come back to it. */
     override fun onStart() {
         super.onStart()
+        runCatching { getSystemService(android.net.ConnectivityManager::class.java).registerNetworkCallback(android.net.NetworkRequest.Builder().build(), netCallback) }
         binding.homeRoot.alpha = 0f
         binding.homeRoot.translationY = resources.displayMetrics.density * 14
         binding.homeRoot.animate().alpha(1f).translationY(0f).setDuration(ENTER_MS).start()
+    }
+
+    override fun onStop() {
+        runCatching { getSystemService(android.net.ConnectivityManager::class.java).unregisterNetworkCallback(netCallback) }
+        binding.root.removeCallbacks(readNetNow)
+        super.onStop()
     }
 
     override fun onPause() {
@@ -265,12 +296,58 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    /** Several callbacks arrive together when the network changes: read once, a moment later. */
+    private fun netChanged() {
+        binding.root.removeCallbacks(readNetNow)
+        binding.root.postDelayed(readNetNow, NET_SETTLE_MS)
+    }
+
+    private fun readNet() {
+        worker.execute {
+            val n = runCatching { NetStatus.read(this) }.getOrNull() ?: return@execute
+            runOnUiThread { if (!isFinishing && !isDestroyed) showNet(n) }
+        }
+    }
+
+    private fun showNet(n: NetStatus.Net) {
+        val quiet = ContextCompat.getColor(this, R.color.text_secondary)
+        val warn = ContextCompat.getColor(this, R.color.warn)
+        val bad = ContextCompat.getColor(this, R.color.bad)
+        val (linkText, linkIcon) = when {
+            n.link == NetStatus.Link.NONE -> getString(R.string.home_net_offline) to R.drawable.ic_wifi
+            !n.online -> getString(R.string.home_net_no_internet) to (if (n.link == NetStatus.Link.ETHERNET) R.drawable.ic_ethernet else R.drawable.ic_wifi)
+            n.link == NetStatus.Link.WIFI -> getString(R.string.home_net_wifi, getString(when (NetStatus.strength(n.bars ?: 4)) {
+                NetStatus.Strength.STRONG -> R.string.home_net_strong
+                NetStatus.Strength.FAIR -> R.string.home_net_fair
+                NetStatus.Strength.WEAK -> R.string.home_net_weak
+            })) to R.drawable.ic_wifi
+            n.link == NetStatus.Link.ETHERNET -> getString(R.string.home_net_ethernet) to R.drawable.ic_ethernet
+            else -> getString(R.string.home_net_online) to R.drawable.ic_wifi
+        }
+        val linkColor = when {
+            n.link == NetStatus.Link.NONE || !n.online -> bad
+            n.link == NetStatus.Link.WIFI && (n.bars ?: 4) <= 1 -> warn
+            else -> quiet
+        }
+        binding.netLink.text = linkText
+        binding.netLink.setCompoundDrawablesRelativeWithIntrinsicBounds(linkIcon, 0, 0, 0)
+        binding.netLink.compoundDrawableTintList = ColorStateList.valueOf(linkColor)
+        binding.netLink.setTextColor(linkColor)
+        binding.netVpn.text = if (n.vpn) vpnName ?: getString(R.string.home_vpn_on) else getString(R.string.home_vpn_off)
+        binding.netVpn.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_shield, 0, 0, 0)
+        val vpnColor = if (n.vpn) quiet else warn
+        binding.netVpn.compoundDrawableTintList = ColorStateList.valueOf(vpnColor)
+        binding.netVpn.setTextColor(vpnColor)
+    }
+
     private fun loadApps() {
         appsDirty = false
         worker.execute {
             val list = PackageUtil.installedApps(this).filter { it.hasLauncherEntry }.map { HomeLogic.App(it.packageName, it.label) }
+            val vpns = list.filter { com.thefactor1.taskskiller.util.VpnCheck.isVpnApp(this, it.packageName) }
             runOnUiThread {
                 if (isFinishing || isDestroyed) return@runOnUiThread
+                vpnName = vpns.singleOrNull()?.label
                 apps = list
                 shownKey = null
                 render()
@@ -290,10 +367,7 @@ class HomeActivity : AppCompatActivity() {
         binding.dockApps.removeAllViews()
         dock.forEach { app -> binding.dockApps.addView(dockTile(app, favs.isEmpty())) }
         binding.dockDivider.visibility = if (dock.isEmpty()) View.GONE else View.VISIBLE
-        if (!focusedOnce) {
-            focusedOnce = true
-            (binding.dockApps.getChildAt(0)?.findViewById<View>(R.id.tileCard) ?: binding.allApps).requestFocus()
-        }
+        if (!focusedOnce) focusDock()
     }
 
     private fun dockTile(app: HomeLogic.App, noFavourites: Boolean): View {
@@ -353,6 +427,7 @@ class HomeActivity : AppCompatActivity() {
         private const val DOCK_LIFT = 1.12f
         private const val DIMMED = 0.62f
         private const val ENTER_MS = 260L
+        private const val NET_SETTLE_MS = 400L
         private const val READ_MS = 30_000L
         private const val CPU_FRESH_MS = 3 * 60_000L
         private const val PLAY_SETTLE_MS = 600L

@@ -1,6 +1,6 @@
 ## 0.7.1
 New: Refresher Home, a light launcher. A big clock, how the TV is doing (memory, processor, storage), and a dock of your favourite apps with All apps beside it. Clean up stops background apps over a size you choose, never the one on screen, your VPN, or music that's playing. Hold OK or press Menu on an app to favourite, move, hide, stop it or see its info.
-Three colour themes (Midnight, Aurora, Ember) in Home settings. Everything fits on one screen, so nothing is ever cut off.
+Home takes on the colour of the app you select, with the clock inside a ring that shows free memory. It also shows your Wi-Fi and whether the VPN is on. Three colour themes (Midnight, Aurora, Ember) in Home settings. Everything fits on one screen, so nothing is ever cut off.
 Music keeps playing: Home shows what's playing with pause and play, and neither Clean up nor a scheduled refresh stops an app that's playing.
 
 ## 0.6.9

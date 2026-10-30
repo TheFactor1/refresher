@@ -96,7 +96,7 @@
     <string name="privacy_row">Privacy</string>
     <string name="privacy_row_hint">What Refresher can see and does with it</string>
     <string name="privacy_title">Privacy</string>
-    <string name="privacy_body">Refresher stops an app on this TV on a schedule you choose, then opens it again. That is all it does.\n\n•  No account, ads, analytics or tracking.\n•  Nothing is uploaded. The only download is Shizuku itself, from Shizuku\'s own GitHub page, and only if you press Get in Setup. Refresher checks it is signed by Shizuku\'s developer before installing it. Otherwise its only network connection is to this TV itself, for setup.\n•  It can\'t see your files or your accounts. With Shizuku, Home shows the title of music or a show playing in the background and keeps refreshes away from it; that title is never stored or sent. The System page shows how much memory and processor each app uses. It keeps a one-hour history of memory and processor (one reading a minute, on this TV only).\n•  It keeps your rules and a short activity log on this TV, plus a small backup file of app names and intervals.\n•  Remove Refresher\'s setup, under Setup, undoes everything setup changed and deletes the backup.\n\nIt is open source: github.com/TheFactor1/refresher</string>
+    <string name="privacy_body">Refresher stops an app on this TV on a schedule you choose, then opens it again. That is all it does.\n\n•  No account, ads, analytics or tracking.\n•  Nothing is uploaded. The only download is Shizuku itself, from Shizuku\'s own GitHub page, and only if you press Get in Setup. Refresher checks it is signed by Shizuku\'s developer before installing it. Otherwise its only network connection is to this TV itself, for setup.\n•  It can\'t see your files or your accounts. With Shizuku, Home shows the title of music or a show playing in the background and keeps refreshes away from it; that title is never stored or sent. Home also shows whether the TV is online, how strong the Wi-Fi is and whether a VPN is on (never which network or where). The System page shows how much memory and processor each app uses. It keeps a one-hour history of memory and processor (one reading a minute, on this TV only).\n•  It keeps your rules and a short activity log on this TV, plus a small backup file of app names and intervals.\n•  Remove Refresher\'s setup, under Setup, undoes everything setup changed and deletes the backup.\n\nIt is open source: github.com/TheFactor1/refresher</string>
     <string name="privacy_ok">Got it</string>
     <string name="restore_title">Restore your apps?</string>
     <string name="restore_message">Refresher found a backup from %1$s:\n\n%2$s</string>
@@ -292,6 +292,16 @@
     <string name="home_meter_cpu">PROCESSOR</string>
     <string name="home_meter_storage">STORAGE</string>
     <string name="home_meter_free">%1$d%% free</string>
+    <string name="home_net_wifi">Wi-Fi · %1$s</string>
+    <string name="home_net_strong">strong</string>
+    <string name="home_net_fair">fair</string>
+    <string name="home_net_weak">weak</string>
+    <string name="home_net_ethernet">Ethernet</string>
+    <string name="home_net_online">Online</string>
+    <string name="home_net_offline">Offline</string>
+    <string name="home_net_no_internet">No internet</string>
+    <string name="home_vpn_on">VPN on</string>
+    <string name="home_vpn_off">VPN off</string>
     <string name="home_halo_free">%1$d%% memory free</string>
     <string name="home_storage_free">%1$s free</string>
     <string name="home_open_hint">%1$s  ·  OK to open</string>

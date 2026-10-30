@@ -26,14 +26,39 @@
 
             <TextView
                 android:id="@+id/homeGreeting"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:alpha="0.85"
                 android:maxLines="1"
                 android:textColor="@color/text_primary"
                 android:textSize="15sp" />
 
+            <TextView
+                android:id="@+id/netLink"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:drawablePadding="6dp"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/netVpn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:drawablePadding="6dp"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
 
             <LinearLayout
                 android:id="@+id/nowPlaying"

@@ -372,10 +372,29 @@ class HomeActivity : AppCompatActivity() {
         val (favs, rest) = HomeLogic.arrange(list, prefs.favourites, prefs.hidden)
         // No favourites yet: the first apps A to Z keep the dock from looking empty.
         val dock = (favs.ifEmpty { rest }).take(DOCK_SIZE)
+        // Rebuilding the dock throws away the selected tile: remember which app it was and select it again.
+        val hadFocus = binding.dock.hasFocus()
+        val selected = binding.dock.findFocus()?.tag as? String
         binding.dockApps.removeAllViews()
         dock.forEach { app -> binding.dockApps.addView(dockTile(app, favs.isEmpty())) }
         binding.dockDivider.visibility = if (dock.isEmpty()) View.GONE else View.VISIBLE
-        if (!focusedOnce) focusDock()
+        when {
+            !focusedOnce -> focusDock()
+            // Once the new tiles are laid out (a fresh tile can't take focus before then).
+            hadFocus -> {
+                binding.allApps.requestFocus() // hold focus in the dock meanwhile, so nothing else grabs it
+                binding.dockApps.post { (dockCard(selected) ?: binding.dockApps.getChildAt(0)?.findViewById(R.id.tileCard) ?: binding.allApps).requestFocus() }
+            }
+        }
+    }
+
+    private fun dockCard(pkg: String?): View? = if (pkg == null) null else
+        (0 until binding.dockApps.childCount).map { binding.dockApps.getChildAt(it).findViewById<View>(R.id.tileCard) }.firstOrNull { it.tag == pkg }
+
+    /** Favourites, hidden apps or tiles changed (from the options dialog): lay the dock out again. */
+    internal fun appsChanged() {
+        shownKey = null
+        render()
     }
 
     private fun dockTile(app: HomeLogic.App, noFavourites: Boolean): View {
@@ -389,11 +408,12 @@ class HomeActivity : AppCompatActivity() {
         TileFocus.setUp(b.tileCard, theme.accent)
         // The dock's caption names the focused app; an icon tile here is too short for its own label.
         b.tileIconName.visibility = View.GONE
+        b.tileCard.tag = app.packageName
         b.tileCard.contentDescription = app.label
         b.tileCard.setOnClickListener { AppActions.open(this, app) }
-        b.tileCard.setOnLongClickListener { AppActions.options(this, app) { shownKey = null; render() }; true }
+        b.tileCard.setOnLongClickListener { AppActions.options(this, app) { appsChanged() }; true }
         b.tileCard.setOnKeyListener { _, keyCode, event ->
-            if (keyCode == KeyEvent.KEYCODE_MENU && event.action == KeyEvent.ACTION_UP) { AppActions.options(this, app) { shownKey = null; render() }; true } else false
+            if (keyCode == KeyEvent.KEYCODE_MENU && event.action == KeyEvent.ACTION_UP) { AppActions.options(this, app) { appsChanged() }; true } else false
         }
         b.tileCard.setOnFocusChangeListener { v, has ->
             TileFocus.lift(v, has, DOCK_LIFT)

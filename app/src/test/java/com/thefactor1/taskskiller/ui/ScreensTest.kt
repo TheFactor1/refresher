@@ -11,6 +11,7 @@ import com.thefactor1.taskskiller.R
 import com.thefactor1.taskskiller.data.RuleStore
 import com.thefactor1.taskskiller.status.HealthReader
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -290,6 +291,26 @@ class ScreensTest(private val fontScale: Float) {
         } finally {
             HomeActivity.meminfo = { java.io.File("/proc/meminfo").readText() }
         }
+    }
+
+    @Test fun launcherKeepsSelectionWhenFavouritesChange() {
+        val prefs = com.thefactor1.taskskiller.home.HomePrefs.get(RuntimeEnvironment.getApplication())
+        prefs.favourites = listOf(Fixture.TIVI.pkg, Fixture.PLEX.pkg, Fixture.YOUTUBE.pkg)
+        val a = launch(HomeActivity::class.java) as HomeActivity
+        idleFor(600)
+        val dock = a.findViewById<android.view.ViewGroup>(R.id.dockApps)
+        dock.getChildAt(1).findViewById<View>(R.id.tileCard).requestFocus()
+        // Plex moves to the front, as "Move left" or a new favourite would do.
+        prefs.favourites = listOf(Fixture.PLEX.pkg, Fixture.TIVI.pkg, Fixture.YOUTUBE.pkg)
+        a.appsChanged()
+        idleFor(200)
+        val focused = a.findViewById<View>(R.id.dock).findFocus()
+        assertEquals("Plex is still selected", Fixture.PLEX.pkg, focused?.tag)
+        // A new favourite: still something selected in the dock.
+        prefs.favourites = listOf(Fixture.YOUTUBE.pkg)
+        a.appsChanged()
+        idleFor(200)
+        assertTrue("the dock still has the selection", a.findViewById<View>(R.id.dock).hasFocus())
     }
 
     @Test fun launcherAllApps() {

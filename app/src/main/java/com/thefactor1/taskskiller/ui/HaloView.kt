@@ -50,7 +50,8 @@ class HaloView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     }
 
     override fun onDraw(c: Canvas) {
-        val pad = 8f * d
+        // Room for the dot's glow (its widest part) wherever the dot sits, so it's never clipped at the edge.
+        val pad = DOT_GLOW * d + 2f * d
         val r = min(width, height) / 2f - pad
         val cx = width / 2f; val cy = height / 2f
         box.set(cx - r, cy - r, cx + r, cy + r)
@@ -66,7 +67,7 @@ class HaloView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         val a = Math.toRadians((-90f + sweep).toDouble())
         val x = cx + r * cos(a).toFloat(); val y = cy + r * sin(a).toFloat()
         dotGlow.color = Color.argb(0x55, Color.red(color), Color.green(color), Color.blue(color))
-        c.drawCircle(x, y, 11f * d, dotGlow)
+        c.drawCircle(x, y, DOT_GLOW * d, dotGlow)
         c.drawCircle(x, y, 4.5f * d, dot)
     }
 
@@ -78,5 +79,10 @@ class HaloView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     override fun onDetachedFromWindow() {
         anim?.cancel()
         super.onDetachedFromWindow()
+    }
+
+    companion object {
+        /** The dot's glow radius in dp: the widest thing drawn, so it sets the ring's inset. */
+        private const val DOT_GLOW = 11f
     }
 }

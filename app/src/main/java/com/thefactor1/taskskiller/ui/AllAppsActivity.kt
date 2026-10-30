@@ -65,8 +65,16 @@ class AllAppsActivity : AppCompatActivity() {
     }
 
     private fun render(focusFirst: Boolean = false) {
+        // A favourite moves to the front: keep the same app selected wherever it lands.
+        val selected = binding.appsGrid.findFocus()?.let { binding.appsGrid.findContainingViewHolder(it)?.bindingAdapterPosition }
+            ?.let { adapter.packageAt(it) }
         val (favs, rest) = HomeLogic.arrange(apps, prefs.favourites, prefs.hidden)
         adapter.submit(favs + rest, favs.size)
+        if (selected != null) {
+            val pos = adapter.positionOf(selected).takeIf { it >= 0 } ?: 0
+            binding.appsGrid.scrollToPosition(pos)
+            binding.appsGrid.post { binding.appsGrid.findViewHolderForAdapterPosition(pos)?.itemView?.findViewById<View>(R.id.tileCard)?.requestFocus() }
+        }
         binding.appsCount.text = resources.getQuantityString(R.plurals.home_app_count, favs.size + rest.size, favs.size + rest.size)
         if (focusFirst) binding.appsGrid.post { binding.appsGrid.findViewHolderForAdapterPosition(0)?.itemView?.findViewById<View>(R.id.tileCard)?.requestFocus() }
     }
@@ -92,6 +100,9 @@ class AllAppsActivity : AppCompatActivity() {
             rows = list; favCount = favourites
             notifyDataSetChanged()
         }
+
+        fun packageAt(pos: Int) = rows.getOrNull(pos)?.packageName
+        fun positionOf(pkg: String) = rows.indexOfFirst { it.packageName == pkg }
 
         override fun getItemCount() = rows.size
         override fun getItemId(position: Int) = rows[position].packageName.hashCode().toLong()

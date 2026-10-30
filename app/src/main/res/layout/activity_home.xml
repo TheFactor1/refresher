@@ -115,6 +115,16 @@
                 android:text="@string/home_clean" />
 
             <TextView
+                android:id="@+id/androidChip"
+                style="@style/GlassChip"
+                android:layout_width="40dp"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="@string/tv_settings"
+                android:drawableStart="@drawable/ic_android"
+                android:paddingStart="11dp"
+                android:paddingEnd="11dp" />
+
+            <TextView
                 android:id="@+id/settingsChip"
                 style="@style/GlassChip"
                 android:layout_width="40dp"

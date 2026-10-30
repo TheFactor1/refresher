@@ -107,6 +107,7 @@ class HomeActivity : AppCompatActivity() {
         binding.halo.setOnClickListener { startActivity(Intent(this, SystemActivity::class.java)) }
         binding.cleanChip.setOnClickListener { cleanUp() }
         binding.settingsChip.setOnClickListener { startActivity(Intent(this, HomeSettingsActivity::class.java)) }
+        binding.androidChip.setOnClickListener { AppActions.openTvSettings(this) }
         binding.allApps.setOnClickListener { startActivity(Intent(this, AllAppsActivity::class.java)) }
         binding.allApps.setOnFocusChangeListener { v, has ->
             TileFocus.lift(v, has, DOCK_LIFT)

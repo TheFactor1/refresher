@@ -83,7 +83,7 @@ class HomeSettingsActivity : AppCompatActivity() {
 
         binding.androidRow.rowTitle.setText(R.string.home_set_android)
         binding.androidRow.rowHint.setText(R.string.home_set_android_hint)
-        binding.androidRow.root.setOnClickListener { runCatching { startActivity(Intent(Settings.ACTION_SETTINGS)) } }
+        binding.androidRow.root.setOnClickListener { AppActions.openTvSettings(this) }
 
         show()
         binding.defaultRow.root.requestFocus()

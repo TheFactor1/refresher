@@ -382,6 +382,8 @@
     <string name="home_unhide_title">Show on Home again</string>
     <string name="home_set_rules">Refresher rules</string>
     <string name="home_set_rules_hint">Apps stopped and reopened on a schedule</string>
+    <string name="tv_settings">Android settings</string>
+    <string name="tv_settings_missing">This TV\'s settings couldn\'t be opened.</string>
     <string name="home_set_android">Android settings</string>
     <string name="home_set_android_hint">The TV\'s own settings</string>
     <plurals name="home_hidden_count">

@@ -274,7 +274,7 @@ class ScreensTest(private val fontScale: Float) {
             idleFor(600)
             val dock = a.findViewById<android.view.ViewGroup>(R.id.dockApps)
             val cards = (0 until dock.childCount).map { dock.getChildAt(it).findViewById<View>(R.id.tileCard) }
-            val chips = listOf(R.id.cleanChip, R.id.settingsChip).map { a.findViewById<View>(it) }
+            val chips = listOf(R.id.cleanChip, R.id.androidChip, R.id.settingsChip).map { a.findViewById<View>(it) }
             val problems = common(a.window.decorView.findViewById(android.R.id.content), allowEllipsis = { it.id == R.id.tileIconName }) +
                 LayoutCheck.leftAt(a.findViewById(R.id.homeGreeting), gutter) +
                 LayoutCheck.sameHeight("dock tiles", cards) +

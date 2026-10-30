@@ -17,6 +17,16 @@ object AppActions {
 
     private val worker = Executors.newSingleThreadExecutor()
 
+    /** The TV's own Android settings: the system's Settings screen, or the TV settings app if that's all there is. */
+    fun openTvSettings(activity: Activity) {
+        val tries = listOf(
+            Intent(Settings.ACTION_SETTINGS),
+            activity.packageManager.getLeanbackLaunchIntentForPackage("com.android.tv.settings")
+        )
+        val ok = tries.filterNotNull().any { runCatching { activity.startActivity(it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }.isSuccess }
+        if (!ok) Toast.makeText(activity, R.string.tv_settings_missing, Toast.LENGTH_SHORT).show()
+    }
+
     fun open(activity: Activity, app: HomeLogic.App) {
         val intent = com.thefactor1.taskskiller.util.PackageUtil.launchIntent(activity, app.packageName)?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         val ok = intent != null && runCatching { activity.startActivity(intent) }.isSuccess

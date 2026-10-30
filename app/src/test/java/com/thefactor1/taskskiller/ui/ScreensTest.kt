@@ -213,12 +213,29 @@ class ScreensTest(private val fontScale: Float) {
         onScreen = Fixture.TIVI.pkg
     )
 
+    /** A realistic hour: steady until a spike 18 min ago (a big app named), a 9-minute sleep gap, then recovery. */
+    private fun systemHour(struggling: Boolean): List<com.thefactor1.taskskiller.status.SystemHistory.Sample> {
+        val now = System.currentTimeMillis()
+        return (0..59).filter { it !in 30..38 }.map { m ->
+            val minAgo = 59 - m
+            val spike = struggling && minAgo in 14..22
+            com.thefactor1.taskskiller.status.SystemHistory.Sample(
+                at = now - minAgo * 60_000L,
+                memUsedPct = if (spike) 88 + (minAgo % 3) else 58 + (m % 5),
+                swapUsedPct = if (spike) 85 else 30,
+                cpuPct = if (spike) 70 + (m % 7) * 3 else 8 + (m % 6) * 2,
+                hog = if (spike && minAgo == 18) Fixture.PLEX.pkg else null,
+                hogKb = if (spike && minAgo == 18) 294_912L else null)
+        }
+    }
+
     @Test fun systemStruggling() = checkSystem("system-struggling", struggling = true)
 
     @Test fun systemSmooth() = checkSystem("system-smooth", struggling = false)
 
     private fun checkSystem(name: String, struggling: Boolean) {
         com.thefactor1.taskskiller.status.SystemReader.override = { systemSnapshot(struggling) }
+        com.thefactor1.taskskiller.status.SystemHistory.override = { systemHour(struggling) }
         try {
             val a = launch(SystemActivity::class.java)
             idleFor(400)
@@ -233,12 +250,15 @@ class ScreensTest(private val fontScale: Float) {
                 LayoutCheck.sameLeft("meters", *meters.toTypedArray()) +
                 LayoutCheck.sameRight("meters", *meters.toTypedArray()) +
                 rightAtGutter(a.findViewById(R.id.meterPanel)) + rightAtGutter(a.findViewById(R.id.systemVerdict)) +
-                (if (rows.size < 5) listOf("only ${rows.size} app rows fit on screen") else emptyList()) +
+                (if (rows.size < 3) listOf("only ${rows.size} app rows fit on screen") else emptyList()) +
+                LayoutCheck.sameLeft("history and list", a.findViewById(R.id.historyCard), a.findViewById(R.id.appsHeader)) +
+                LayoutCheck.sameRight("history and rows", a.findViewById(R.id.historyCard), *rows.toTypedArray()) +
                 (if (rows.firstOrNull()?.hasFocus() != true) listOf("first app row is not focused") else emptyList())
             shoot(a, name)
             assertNoProblems(name, problems)
         } finally {
             com.thefactor1.taskskiller.status.SystemReader.override = null
+            com.thefactor1.taskskiller.status.SystemHistory.override = null
         }
     }
 

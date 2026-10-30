@@ -100,6 +100,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        com.thefactor1.taskskiller.schedule.HistorySampler.arm(this)
         // Alarms can be dropped by firmware task-killers, so re-arm on every visit.
         RestartScheduler.scheduleAll(this)
         refresh()

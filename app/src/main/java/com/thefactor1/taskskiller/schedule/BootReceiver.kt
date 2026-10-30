@@ -21,6 +21,7 @@ class BootReceiver : BroadcastReceiver() {
             Intent.ACTION_MY_PACKAGE_REPLACED -> {
                 Log.i(TAG, "Re-arming schedules after ${intent.action}")
                 RestartScheduler.scheduleAll(context)
+                if (intent.action != Intent.ACTION_LOCKED_BOOT_COMPLETED) HistorySampler.arm(context)
                 // Shizuku's server dies with the reboot. Only after a full boot:
                 // the adb key it needs lives in credential-encrypted storage.
                 if (intent.action == Intent.ACTION_BOOT_COMPLETED &&

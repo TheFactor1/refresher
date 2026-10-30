@@ -96,7 +96,7 @@
     <string name="privacy_row">Privacy</string>
     <string name="privacy_row_hint">What Refresher can see and does with it</string>
     <string name="privacy_title">Privacy</string>
-    <string name="privacy_body">Refresher stops an app on this TV on a schedule you choose, then opens it again. That is all it does.\n\n•  No account, ads, analytics or tracking.\n•  Nothing is uploaded. The only download is Shizuku itself, from Shizuku\'s own GitHub page, and only if you press Get in Setup. Refresher checks it is signed by Shizuku\'s developer before installing it. Otherwise its only network connection is to this TV itself, for setup.\n•  It can\'t see what you watch, your files or your accounts. The System page shows how much memory and processor each app uses, read on this TV only while that page is open.\n•  It keeps your rules and a short activity log on this TV, plus a small backup file of app names and intervals.\n•  Remove Refresher\'s setup, under Setup, undoes everything setup changed and deletes the backup.\n\nIt is open source: github.com/TheFactor1/refresher</string>
+    <string name="privacy_body">Refresher stops an app on this TV on a schedule you choose, then opens it again. That is all it does.\n\n•  No account, ads, analytics or tracking.\n•  Nothing is uploaded. The only download is Shizuku itself, from Shizuku\'s own GitHub page, and only if you press Get in Setup. Refresher checks it is signed by Shizuku\'s developer before installing it. Otherwise its only network connection is to this TV itself, for setup.\n•  It can\'t see what you watch, your files or your accounts. The System page shows how much memory and processor each app uses. It keeps a one-hour history of memory and processor (one reading a minute, on this TV only).\n•  It keeps your rules and a short activity log on this TV, plus a small backup file of app names and intervals.\n•  Remove Refresher\'s setup, under Setup, undoes everything setup changed and deletes the backup.\n\nIt is open source: github.com/TheFactor1/refresher</string>
     <string name="privacy_ok">Got it</string>
     <string name="restore_title">Restore your apps?</string>
     <string name="restore_message">Refresher found a backup from %1$s:\n\n%2$s</string>
@@ -265,4 +265,13 @@
     <string name="system_stop_failed">Couldn\'t stop %1$s: %2$s</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="system_history_title">Last hour</string>
+    <string name="system_history_memory">Memory</string>
+    <string name="system_history_cpu">Processor</string>
+    <string name="system_history_desc">Last hour, %1$d readings</string>
+    <string name="system_history_empty">Readings start a minute after opening Refresher, while the TV is on.</string>
+    <string name="system_history_calm">Nothing unusual in the last hour.</string>
+    <string name="system_history_peak_mem">Peak %1$d%% memory at %2$s</string>
+    <string name="system_history_peak_cpu">Peak %1$d%% processor at %2$s</string>
+    <string name="system_history_peak_app">%1$s · %2$s using %3$s</string>
 </resources>

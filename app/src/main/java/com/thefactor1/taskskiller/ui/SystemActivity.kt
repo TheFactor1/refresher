@@ -21,6 +21,8 @@ import com.thefactor1.taskskiller.databinding.ItemSystemAppBinding
 import com.thefactor1.taskskiller.databinding.ViewMeterBinding
 import com.thefactor1.taskskiller.kill.KillBackends
 import com.thefactor1.taskskiller.schedule.RestartScheduler
+import com.thefactor1.taskskiller.schedule.HistorySampler
+import com.thefactor1.taskskiller.status.SystemHistory
 import com.thefactor1.taskskiller.status.SystemReader
 import com.thefactor1.taskskiller.status.SystemStats
 import com.thefactor1.taskskiller.status.SystemStats.Level
@@ -66,6 +68,7 @@ class SystemActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        HistorySampler.arm(this)
         ticks = 0
         binding.root.post(ticker)
     }
@@ -86,9 +89,10 @@ class SystemActivity : AppCompatActivity() {
         val r = reader ?: return
         worker.execute {
             val snap = try { r.read(withApps) } catch (e: Exception) { null }
+            val history = try { SystemHistory.load(this) } catch (e: Exception) { emptyList() }
             runOnUiThread {
                 reading = false
-                if (!isFinishing && !isDestroyed) render(snap)
+                if (!isFinishing && !isDestroyed) { render(snap); renderHistory(history) }
             }
         }
     }
@@ -126,6 +130,25 @@ class SystemActivity : AppCompatActivity() {
         if (!focused && s.apps.isNotEmpty()) {
             focused = true
             binding.appList.post { binding.appList.getChildAt(0)?.requestFocus() }
+        }
+    }
+
+    private fun renderHistory(samples: List<SystemHistory.Sample>) {
+        binding.historyChart.show(samples, System.currentTimeMillis())
+        val time = android.text.format.DateFormat.getTimeFormat(this)
+        val peak = SystemHistory.peak(samples)
+        binding.historyNote.text = when {
+            samples.isEmpty() -> getString(R.string.system_history_empty)
+            peak == null -> getString(R.string.system_history_calm)
+            else -> {
+                val at = time.format(java.util.Date(peak.sample.at))
+                val head = if (peak.memory) getString(R.string.system_history_peak_mem, peak.sample.memUsedPct, at)
+                    else getString(R.string.system_history_peak_cpu, peak.sample.cpuPct ?: 0, at)
+                val hog = SystemHistory.hogNear(samples, peak.sample.at)
+                if (hog?.hog != null && hog.hogKb != null)
+                    getString(R.string.system_history_peak_app, head, PackageUtil.label(this, hog.hog), SystemStats.size(hog.hogKb))
+                else head
+            }
         }
     }
 

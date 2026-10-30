@@ -1,3 +1,6 @@
+## 0.6.9
+System now shows the last hour: memory and processor as two lines, and the worst moment named under them, with the app that was using the most memory then. It takes one reading a minute while the TV is on, keeps only the last hour on the TV, and never wakes a sleeping TV.
+
 ## 0.6.8
 New: System, from the home screen. It shows how hard the TV is working (memory, swap, processor, storage) and which apps use the most memory. Pick one to stop it now, or add a stop-only rule. And a scheduled refresh now never stops the app you're watching: it waits and tries again.
 

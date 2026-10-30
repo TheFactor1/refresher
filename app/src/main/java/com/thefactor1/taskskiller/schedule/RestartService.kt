@@ -153,8 +153,10 @@ class RestartService : Service() {
 
         // Never stop the app on screen on a schedule: wait and retry instead.
         val inFront = if (displayWasOff) null else ForegroundApp.packageName(this, backend)
-        if (OnScreenGuard.shouldDefer(manual, !displayWasOff, inFront, rule.packageName)) {
-            record(rule, "Deferred: ${rule.label} is on screen", success = true, advanceClock = false)
+        val playing = if (manual) emptySet() else com.thefactor1.taskskiller.home.NowPlaying.playingPackages(this, backend)
+        if (OnScreenGuard.shouldDefer(manual, !displayWasOff, inFront, rule.packageName, playing)) {
+            val why = if (rule.packageName in playing) "is playing" else "is on screen"
+            record(rule, "Deferred: ${rule.label} $why", success = true, advanceClock = false)
             RestartScheduler.scheduleAt(this, rule.id, System.currentTimeMillis() + minOf(rule.intervalMillis, DEFER_RETRY_MS))
             return
         }

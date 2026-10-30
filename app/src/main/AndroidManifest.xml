@@ -157,6 +157,10 @@
 
         <activity
 
+            android:name=".ui.AllAppsActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".ui.HomeSettingsActivity"
 
             android:exported="false" />

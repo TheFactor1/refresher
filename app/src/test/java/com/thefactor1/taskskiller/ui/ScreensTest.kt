@@ -271,26 +271,52 @@ class ScreensTest(private val fontScale: Float) {
         try {
             val a = launch(HomeActivity::class.java)
             idleFor(600)
-            val grid = a.findViewById<RecyclerView>(R.id.homeGrid)
-            val cards = (0 until grid.childCount).mapNotNull { grid.getChildAt(it).findViewById<View>(R.id.tileCard) }
-            val favCards = cards.take(3)
-            val appCards = cards.drop(3)
-            val chips = listOf(R.id.healthChip, R.id.cleanChip, R.id.refresherChip, R.id.settingsChip).map { a.findViewById<View>(it) }
-            val problems = common(a.window.decorView.findViewById(android.R.id.content), allowEllipsis = { it.id == R.id.tileName || it.id == R.id.tileIconName }) +
-                LayoutCheck.leftAt(a.findViewById(R.id.homeClock), gutter) +
-                LayoutCheck.sameHeight("favourite tiles", favCards) +
-                LayoutCheck.sameHeight("app tiles", appCards) +
-                (if (favCards.first().height <= appCards.first().height) listOf("favourites aren't bigger than apps") else emptyList()) +
-                liftedInside(a, favCards, 1.05f) + liftedInside(a, appCards, 1.08f) +
+            val dock = a.findViewById<android.view.ViewGroup>(R.id.dockApps)
+            val cards = (0 until dock.childCount).map { dock.getChildAt(it).findViewById<View>(R.id.tileCard) }
+            val chips = listOf(R.id.healthChip, R.id.cleanChip, R.id.settingsChip).map { a.findViewById<View>(it) }
+            val meters = listOf(R.id.memMeter, R.id.cpuMeter, R.id.diskMeter).map { a.findViewById<View>(it) }
+            val problems = common(a.window.decorView.findViewById(android.R.id.content), allowEllipsis = { it.id == R.id.tileIconName }) +
+                LayoutCheck.leftAt(a.findViewById(R.id.homeGreeting), gutter) +
+                LayoutCheck.sameHeight("dock tiles", cards) +
                 LayoutCheck.sameHeight("chips", chips) +
+                LayoutCheck.sameHeight("meters", meters) +
                 rightAtGutter(a.findViewById(R.id.settingsChip)) +
-                (if (cards.size < 5) listOf("only ${cards.size} tiles shown") else emptyList()) +
-                (if (cards.firstOrNull()?.hasFocus() != true) listOf("first favourite is not focused") else emptyList())
+                centred(a, a.findViewById(R.id.homeClock)) + centred(a, a.findViewById(R.id.dock)) + centred(a, a.findViewById(R.id.meters)) +
+                (if (cards.size != 3) listOf("dock shows ${cards.size} favourites, not 3") else emptyList()) +
+                (if (cards.firstOrNull()?.hasFocus() != true) listOf("first favourite is not focused") else emptyList()) +
+                liftedInside(a, cards, 1.08f, a.findViewById(R.id.dock)) +
+                liftedInside(a, listOf(a.findViewById(R.id.allApps)), 1.08f, a.findViewById(R.id.dock))
             shoot(a, "launcher-home")
             assertNoProblems("launcher-home", problems)
         } finally {
             HomeActivity.meminfo = { java.io.File("/proc/meminfo").readText() }
         }
+    }
+
+    @Test fun launcherAllApps() {
+        com.thefactor1.taskskiller.home.HomePrefs.get(RuntimeEnvironment.getApplication()).favourites = listOf(Fixture.PLEX.pkg)
+        val a = launch(AllAppsActivity::class.java)
+        idleFor(600)
+        val grid = a.findViewById<RecyclerView>(R.id.appsGrid)
+        val cards = (0 until grid.childCount).map { grid.getChildAt(it).findViewById<View>(R.id.tileCard) }
+        val area = a.findViewById<View>(R.id.appsArea)
+        val row = grid.getChildAt(0)?.height ?: 0
+        val problems = common(a.window.decorView.findViewById(android.R.id.content), allowEllipsis = { it.id == R.id.tileIconName }) +
+            LayoutCheck.leftAt(a.findViewById(R.id.appsTitle), gutter) + rightAtGutter(a.findViewById(R.id.appsCount)) +
+            LayoutCheck.sameHeight("app tiles", cards) +
+            (if (row == 0 || grid.height % row != 0) listOf("grid ${grid.height}px is not whole rows of ${row}px") else emptyList()) +
+            (if (grid.height > area.height) listOf("grid is taller than its space") else emptyList()) +
+            (if (cards.firstOrNull()?.hasFocus() != true) listOf("first app is not focused") else emptyList()) +
+            liftedInside(a, cards, 1.08f, grid)
+        shoot(a, "launcher-all-apps")
+        assertNoProblems("launcher-all-apps", problems)
+    }
+
+    /** [v] sits in the middle of the screen, to within a pixel or two. */
+    private fun centred(a: android.app.Activity, v: View): List<String> {
+        val p = IntArray(2).also { v.getLocationOnScreen(it) }
+        val mid = p[0] + v.width / 2; val screen = a.window.decorView.width / 2
+        return if (kotlin.math.abs(mid - screen) > 2) listOf("${a.resources.getResourceEntryName(v.id)} is off-centre by ${mid - screen}px") else emptyList()
     }
 
     @Test fun launcherSettings() {
@@ -330,21 +356,21 @@ class ScreensTest(private val fontScale: Float) {
         LayoutCheck.safeArea(root) + LayoutCheck.textFits(root, allowEllipsis) + LayoutCheck.noOverlaps(root)
 
     /** A focused tile grows by [scale]: even then it must stay inside the screen's safe area and its grid (never cut off). */
-    private fun liftedInside(a: android.app.Activity, cards: List<View>, scale: Float): List<String> {
+    private fun liftedInside(a: android.app.Activity, cards: List<View>, scale: Float, container: View): List<String> {
         val root = a.window.decorView
         val d = root.resources.displayMetrics.density
-        val safeX = root.width * 0.05f; val safeY = root.height * 0.05f
-        val grid = a.findViewById<View>(R.id.homeGrid)
+        val safeX = root.width * 0.05f
+        val grid = container
         val g = IntArray(2).also { grid.getLocationOnScreen(it) }
         return cards.flatMap { c ->
             // From the parent, so a tile that's already lifted isn't counted twice.
             val p = IntArray(2).also { (c.parent as View).getLocationOnScreen(it) }.let { intArrayOf(it[0] + c.left, it[1] + c.top) }
             val dx = c.width * (scale - 1) / 2; val dy = c.height * (scale - 1) / 2
-            val l = p[0] - dx; val r = p[0] + c.width + dx; val t = p[1] - dy
+            val l = p[0] - dx; val r = p[0] + c.width + dx; val t = p[1] - dy; val b = p[1] + c.height + dy
             val name = c.contentDescription
             listOfNotNull(
                 if (l < safeX || r > root.width - safeX) "$name lifted spans ${(l / d).toInt()}–${(r / d).toInt()}dp, outside the side safe area" else null,
-                if (l < g[0] || r > g[0] + grid.width || t < g[1]) "$name lifted is clipped by the grid" else null
+                if (l < g[0] || r > g[0] + grid.width || t < g[1] || b > g[1] + grid.height) "$name lifted is clipped by its container" else null
             )
         }
     }

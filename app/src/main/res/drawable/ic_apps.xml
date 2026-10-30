@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- All apps: a 3x3 grid of dots. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="22dp" android:height="22dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF" android:pathData="M5,3a2,2 0 1,0 0.001,0zM12,3a2,2 0 1,0 0.001,0zM19,3a2,2 0 1,0 0.001,0zM5,10a2,2 0 1,0 0.001,0zM12,10a2,2 0 1,0 0.001,0zM19,10a2,2 0 1,0 0.001,0zM5,17a2,2 0 1,0 0.001,0zM12,17a2,2 0 1,0 0.001,0zM19,17a2,2 0 1,0 0.001,0z" />
+</vector>

@@ -117,6 +117,27 @@
     </style>
 
     <!-- A Home header chip (same look as the home screen's Activity / Setup chips). -->
+    <style name="GlassChip">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:background">@drawable/bg_glass_chip</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingStart">14dp</item>
+        <item name="android:paddingEnd">14dp</item>
+        <item name="android:drawablePadding">8dp</item>
+        <item name="android:drawableTint">@color/home_chip_text</item>
+        <item name="android:textColor">@color/home_chip_text</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="HomeMeter">
+        <item name="android:layout_width">@dimen/home_meter_width</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
     <style name="HomeChip">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>

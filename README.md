@@ -10,13 +10,15 @@ storage at a glance, and the apps using the most memory. Pick one to stop it
 now or add a stop-only rule, plus a chart of the last hour. A scheduled
 refresh never stops the app on screen; it waits and tries again.
 
-**New in 0.7.1: Refresher Home.** A light launcher built in: a clock, the TV's
-health, **Clean up** (stops background apps over a size you choose, never the
-one on screen or a VPN), and your apps with favourites first. Hold OK or press
-Menu on an app to favourite, move, hide, stop it or open its info. To use it
-as the TV's home screen, make it the default home app (on a Shield, that means
-disabling the stock launcher over ADB: `adb shell pm disable-user --user 0
-com.google.android.tvlauncher`; `pm enable` undoes it).
+**New in 0.7.1: Refresher Home.** A light launcher built in: a big clock, the
+TV's health (memory, processor, storage), what's playing with pause and play,
+and a dock of favourites with All apps beside it, in three colour themes.
+**Clean up** stops background apps over a size you choose, never the one on
+screen, a VPN, or music that's playing (scheduled refreshes skip playing apps
+too). Hold OK or press Menu on an app to favourite, move, hide, stop it or open
+its info. To use it as the TV's home screen, make it the default home app (on a
+Shield, that means disabling the stock launcher over ADB: `adb shell
+pm disable-user --user 0 com.google.android.tvlauncher`; `pm enable` undoes it).
 
 ## What it is, and what it can see
 

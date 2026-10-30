@@ -113,6 +113,8 @@ class SystemStatsTest {
         assertFalse("display off", OnScreenGuard.shouldDefer(false, false, "com.example.tvplayer", "com.example.tvplayer"))
         assertFalse("Run now always goes ahead", OnScreenGuard.shouldDefer(true, true, "com.example.tvplayer", "com.example.tvplayer"))
         assertFalse("can't tell what's on screen", OnScreenGuard.shouldDefer(false, true, null, "com.example.tvplayer"))
+        assertTrue("playing in the background", OnScreenGuard.shouldDefer(false, false, "com.example.vpn", "com.example.music", setOf("com.example.music")))
+        assertFalse("Run now goes ahead even when playing", OnScreenGuard.shouldDefer(true, true, null, "com.example.music", setOf("com.example.music")))
     }
 
     private fun snapshot(memAvail: Long, swapFree: Long, load: Double) = SystemStats.Snapshot(

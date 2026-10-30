@@ -12,7 +12,7 @@ import com.thefactor1.taskskiller.databinding.RowValueBinding
 import com.thefactor1.taskskiller.home.HomePrefs
 import com.thefactor1.taskskiller.util.PackageUtil
 
-/** Home's settings: tile style, clock, the health pill, Clean up's size and favourites, hidden apps, shortcuts. */
+/** Home's settings: theme, tile style, clock, what's playing, the health pill, Clean up's size and favourites, hidden apps, shortcuts. */
 class HomeSettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeSettingsBinding
@@ -23,6 +23,13 @@ class HomeSettingsActivity : AppCompatActivity() {
         binding = ActivityHomeSettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         prefs = HomePrefs.get(this)
+
+        binding.themeRow.rowTitle.setText(R.string.home_set_theme)
+        binding.themeRow.rowHint.setText(R.string.home_set_theme_hint)
+        stepper(binding.themeRow) { dir ->
+            val all = HomePrefs.Theme.values()
+            prefs.theme = all[(prefs.theme.ordinal + dir).mod(all.size)]
+        }
 
         binding.tilesRow.rowTitle.setText(R.string.home_set_tiles)
         binding.tilesRow.rowHint.setText(R.string.home_set_tiles_hint)
@@ -41,6 +48,10 @@ class HomeSettingsActivity : AppCompatActivity() {
         binding.healthRow.rowTitle.setText(R.string.home_set_health)
         binding.healthRow.rowHint.setText(R.string.home_set_health_hint)
         binding.healthRow.root.setOnClickListener { prefs.showHealth = !prefs.showHealth; show() }
+
+        binding.playingRow.rowTitle.setText(R.string.home_set_playing)
+        binding.playingRow.rowHint.setText(R.string.home_set_playing_hint)
+        binding.playingRow.root.setOnClickListener { prefs.showNowPlaying = !prefs.showNowPlaying; show() }
 
         binding.cleanRow.rowTitle.setText(R.string.home_set_clean)
         binding.cleanRow.rowHint.setText(R.string.home_set_clean_hint)
@@ -66,7 +77,7 @@ class HomeSettingsActivity : AppCompatActivity() {
         binding.androidRow.root.setOnClickListener { runCatching { startActivity(Intent(Settings.ACTION_SETTINGS)) } }
 
         show()
-        binding.tilesRow.root.requestFocus()
+        binding.themeRow.root.requestFocus()
     }
 
     override fun onResume() {
@@ -75,6 +86,12 @@ class HomeSettingsActivity : AppCompatActivity() {
     }
 
     private fun show() {
+        binding.themeRow.rowValue.setText(when (prefs.theme) {
+            HomePrefs.Theme.MIDNIGHT -> R.string.home_theme_midnight
+            HomePrefs.Theme.AURORA -> R.string.home_theme_aurora
+            HomePrefs.Theme.EMBER -> R.string.home_theme_ember
+        })
+        binding.playingRow.rowSwitch.isChecked = prefs.showNowPlaying
         binding.tilesRow.rowValue.setText(if (prefs.tileStyle == HomePrefs.TileStyle.BANNERS) R.string.home_tiles_banners else R.string.home_tiles_icons)
         binding.clockRow.rowValue.setText(when (prefs.clock) {
             HomePrefs.Clock.SYSTEM -> R.string.home_clock_system

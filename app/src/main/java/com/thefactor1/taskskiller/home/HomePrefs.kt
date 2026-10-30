@@ -3,11 +3,12 @@ package com.thefactor1.taskskiller.home
 import android.content.Context
 import android.content.SharedPreferences
 
-/** The launcher's choices: favourites (in order), hidden apps, look, clock and clean-up. */
+/** The launcher's choices: favourites (in order), hidden apps, look and theme, clock, what's playing and clean-up. */
 class HomePrefs private constructor(private val prefs: SharedPreferences) {
 
     enum class TileStyle { BANNERS, ICONS }
     enum class Clock { SYSTEM, H12, H24 }
+    enum class Theme { MIDNIGHT, AURORA, EMBER }
 
     var favourites: List<String>
         get() = prefs.getString(K_FAVS, "").orEmpty().split(',').filter { it.isNotBlank() }
@@ -24,6 +25,14 @@ class HomePrefs private constructor(private val prefs: SharedPreferences) {
     var clock: Clock
         get() = runCatching { Clock.valueOf(prefs.getString(K_CLOCK, Clock.SYSTEM.name)!!) }.getOrDefault(Clock.SYSTEM)
         set(v) = prefs.edit().putString(K_CLOCK, v.name).apply()
+
+    var theme: Theme
+        get() = runCatching { Theme.valueOf(prefs.getString(K_THEME, Theme.MIDNIGHT.name)!!) }.getOrDefault(Theme.MIDNIGHT)
+        set(v) = prefs.edit().putString(K_THEME, v.name).apply()
+
+    var showNowPlaying: Boolean
+        get() = prefs.getBoolean(K_NOW_PLAYING, true)
+        set(v) = prefs.edit().putBoolean(K_NOW_PLAYING, v).apply()
 
     var showHealth: Boolean
         get() = prefs.getBoolean(K_HEALTH, true)
@@ -60,6 +69,8 @@ class HomePrefs private constructor(private val prefs: SharedPreferences) {
         private const val K_TILES = "tiles"
         private const val K_CLOCK = "clock"
         private const val K_HEALTH = "health"
+        private const val K_THEME = "theme"
+        private const val K_NOW_PLAYING = "now_playing"
         private const val K_CLEAN_MB = "cleanup_mb"
         private const val K_CLEAN_FAVS = "cleanup_skips_favourites"
 

@@ -7,7 +7,7 @@ import com.thefactor1.taskskiller.util.ForegroundApp
 import com.thefactor1.taskskiller.util.PackageUtil
 import com.thefactor1.taskskiller.util.VpnCheck
 
-/** "Clean up now": stops background apps over the size limit. Needs Shizuku (it reads every app's memory). */
+/** "Clean up now": stops background apps over the size limit, never one that is playing. Needs Shizuku (it reads every app's memory). */
 object CleanUp {
 
     data class Result(val stopped: List<String>, val freedKb: Long, val failed: Int, val noShell: Boolean = false)
@@ -21,6 +21,8 @@ object CleanUp {
             add(context.packageName)
             apps.forEach { if (VpnCheck.isVpnApp(context, it.packageName)) add(it.packageName) }
             if (prefs.cleanupSkipsFavourites) addAll(prefs.favourites)
+            // Music playing in the background stays playing.
+            addAll(NowPlaying.playingPackages(context, backend))
         }
         val targets = HomeLogic.cleanupTargets(apps, prefs.cleanupMb * 1024L, ForegroundApp.packageName(context, backend), keep)
         val stopped = mutableListOf<String>()

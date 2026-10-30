@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One app on Home: its TV banner (or icon and name) on a card that lifts and rings white when focused. -->
+<!-- One app on Home's dock or in All apps: its TV banner (or icon and name) on a card that lifts and rings white when focused; a dot marks a favourite. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clipChildren="false"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:padding="@dimen/home_tile_pad">
 
     <FrameLayout
         android:id="@+id/tileCard"
         android:layout_width="match_parent"
-        android:layout_height="74dp"
+        android:layout_height="@dimen/home_app_height"
         android:background="@drawable/bg_card"
         android:clickable="true"
         android:focusable="true"
@@ -53,18 +53,15 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
         </LinearLayout>
-    </FrameLayout>
 
-    <TextView
-        android:id="@+id/tileName"
-        style="@style/Text.RowSub"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:paddingStart="2dp"
-        android:paddingEnd="2dp"
-        android:textSize="13sp"
-        android:visibility="gone" />
+        <View
+            android:id="@+id/tileFav"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="6dp"
+            android:background="@drawable/bg_dot"
+            android:backgroundTint="@color/text_primary"
+            android:visibility="gone" />
+    </FrameLayout>
 </LinearLayout>

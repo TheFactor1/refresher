@@ -27,6 +27,4 @@
     <color name="bad_tint">#FF3D1F1D</color>
     <color name="idle">#FF7D8592</color>
     <color name="idle_tint">#FF262A31</color>
-    <!-- Home's backdrop before an app is focused: a soft slate blue. -->
-    <color name="home_wash">#7039507A</color>
 </resources>

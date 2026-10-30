@@ -1,137 +1,240 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Refresher Home: a colour wash taken from the focused app, a big clock, the TV's health, then favourites and apps. -->
+<!--
+  Refresher Home, the ambient dock: a greeting and the TV's health on top, a big clock with three meters
+  (and what's playing) in the middle, and a glass dock of favourites with All apps at the bottom.
+  Everything fits on one screen: nothing scrolls, so nothing is ever cut off.
+-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/homeFrame"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/background">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:id="@+id/homeRoot"
         style="@style/Screen"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="top"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/homeGreeting"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:maxLines="1"
+                android:textSize="15sp" />
+
+            <LinearLayout
+                android:id="@+id/healthChip"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_glass_chip"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp">
+
+                <View
+                    android:id="@+id/healthDot"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/bg_dot"
+                    android:backgroundTint="@color/idle" />
 
                 <TextView
-                    android:id="@+id/homeGreeting"
-                    style="@style/Text.Label"
+                    android:id="@+id/healthText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/text_tertiary" />
+                    android:duplicateParentState="true"
+                    android:maxLines="1"
+                    android:textColor="@color/home_chip_text"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
-                <TextView
-                    android:id="@+id/homeClock"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-light"
-                    android:fontFeatureSettings="tnum"
-                    android:includeFontPadding="false"
-                    android:letterSpacing="-0.02"
-                    android:textColor="@color/text_primary"
-                    android:textSize="64sp" />
+            <TextView
+                android:id="@+id/cleanChip"
+                style="@style/GlassChip"
+                android:layout_marginEnd="8dp"
+                android:drawableStart="@drawable/ic_sparkle"
+                android:text="@string/home_clean" />
 
-                <TextView
-                    android:id="@+id/homeDate"
-                    style="@style/Text.Sub"
-                    android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/settingsChip"
+                style="@style/GlassChip"
+                android:layout_width="40dp"
+                android:contentDescription="@string/home_settings"
+                android:drawableStart="@drawable/ic_gear"
+                android:paddingStart="11dp"
+                android:paddingEnd="11dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/homeDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:letterSpacing="0.25"
+                android:maxLines="1"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/homeClock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-thin"
+                android:fontFeatureSettings="tnum"
+                android:includeFontPadding="false"
+                android:letterSpacing="-0.03"
+                android:maxLines="1"
+                android:textColor="@color/text_primary"
+                android:textSize="120sp" />
+
+            <LinearLayout
+                android:id="@+id/meters"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal">
+
+                <include
+                    android:id="@+id/memMeter"
+                    layout="@layout/view_home_meter" />
+
+                <include
+                    android:id="@+id/cpuMeter"
+                    layout="@layout/view_home_meter"
+                    android:layout_width="@dimen/home_meter_width"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp" />
+                    android:layout_marginStart="28dp" />
+
+                <include
+                    android:id="@+id/diskMeter"
+                    layout="@layout/view_home_meter"
+                    android:layout_width="@dimen/home_meter_width"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="28dp" />
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/nowPlaying"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_glass_chip"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingEnd="6dp"
+                android:visibility="gone">
 
-                <LinearLayout
-                    android:id="@+id/healthChip"
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:duplicateParentState="true"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_music"
+                    android:tint="@color/home_chip_text" />
+
+                <TextView
+                    android:id="@+id/nowPlayingText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/bg_chip"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:minHeight="40dp"
-                    android:orientation="horizontal"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp">
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:duplicateParentState="true"
+                    android:ellipsize="end"
+                    android:maxWidth="440dp"
+                    android:maxLines="1"
+                    android:textColor="@color/home_chip_text"
+                    android:textSize="13sp" />
 
-                    <View
-                        android:id="@+id/healthDot"
-                        android:layout_width="8dp"
-                        android:layout_height="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:background="@drawable/bg_dot"
-                        android:backgroundTint="@color/idle" />
-
-                    <TextView
-                        android:id="@+id/healthText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:duplicateParentState="true"
-                        android:textColor="@color/row_text_secondary"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/cleanChip"
-                    style="@style/HomeChip"
-                    android:layout_marginEnd="8dp"
-                    android:drawableStart="@drawable/ic_sparkle"
-                    android:drawablePadding="8dp"
-                    android:drawableTint="@color/row_text_secondary"
-                    android:text="@string/home_clean" />
-
-                <TextView
-                    android:id="@+id/refresherChip"
-                    style="@style/HomeChip"
-                    android:layout_marginEnd="8dp"
-                    android:drawableStart="@drawable/ic_restart"
-                    android:drawablePadding="8dp"
-                    android:drawableTint="@color/row_text_secondary"
-                    android:text="@string/home_refresher" />
-
-                <TextView
-                    android:id="@+id/settingsChip"
-                    style="@style/HomeChip"
-                    android:contentDescription="@string/home_settings"
-                    android:drawableStart="@drawable/ic_gear"
-                    android:drawableTint="@color/row_text_secondary"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp" />
+                <ImageView
+                    android:id="@+id/nowPlayingIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/bg_dot"
+                    android:backgroundTint="@color/text_primary"
+                    android:importantForAccessibility="no"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_pause"
+                    android:tint="@color/text_on_focus" />
             </LinearLayout>
         </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/homeGrid"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginStart="-8dp"
-            android:layout_marginTop="@dimen/space_m"
-            android:layout_marginEnd="-8dp"
-            android:layout_weight="1"
+        <LinearLayout
+            android:id="@+id/dock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/bg_glass"
             android:clipChildren="false"
             android:clipToPadding="false"
-            android:fadingEdgeLength="@dimen/space_l"
-            android:requiresFadingEdge="vertical"
-            android:overScrollMode="never"
-            android:paddingTop="4dp"
-            android:paddingBottom="@dimen/space_l"
-            android:scrollbars="none" />
+            android:elevation="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="4dp">
+
+            <LinearLayout
+                android:id="@+id/dockApps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:orientation="horizontal" />
+
+            <View
+                android:id="@+id/dockDivider"
+                android:layout_width="1dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:background="#1FFFFFFF" />
+
+            <ImageView
+                android:id="@+id/allApps"
+                android:layout_width="61dp"
+                android:layout_height="61dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/bg_glass_tile"
+                android:clickable="true"
+                android:contentDescription="@string/home_all_apps"
+                android:focusable="true"
+                android:scaleType="center"
+                android:src="@drawable/ic_apps"
+                android:tint="@color/text_primary" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/dockCaption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp" />
     </LinearLayout>
 </FrameLayout>

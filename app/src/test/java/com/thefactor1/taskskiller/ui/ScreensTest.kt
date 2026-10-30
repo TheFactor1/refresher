@@ -195,6 +195,53 @@ class ScreensTest(private val fontScale: Float) {
         assertNoProblems("activity-empty", common(a.window.decorView.findViewById(android.R.id.content)))
     }
 
+    // ---------- System ----------
+
+    private fun systemSnapshot(struggling: Boolean) = com.thefactor1.taskskiller.status.SystemStats.Snapshot(
+        memTotalKb = 3016708, memAvailableKb = if (struggling) 782972 else 1149184,
+        swapTotalKb = 524284, swapFreeKb = if (struggling) 78816 else 400000,
+        load1 = if (struggling) 5.2 else 1.4, cores = 4, cpuBusyPct = if (struggling) 81 else 9,
+        storageFreeBytes = 3_600_000_000, storageTotalBytes = 12_000_000_000,
+        apps = listOf(
+            com.thefactor1.taskskiller.status.SystemStats.AppUse(Fixture.TIVI.pkg, 436_337, 63.0),
+            com.thefactor1.taskskiller.status.SystemStats.AppUse(Fixture.PLEX.pkg, 294_912, 38.0),
+            com.thefactor1.taskskiller.status.SystemStats.AppUse(Fixture.NORD.pkg, 147_330, 13.0),
+            com.thefactor1.taskskiller.status.SystemStats.AppUse(Fixture.PROJECTIVY.pkg, 124_967, 0.4),
+            com.thefactor1.taskskiller.status.SystemStats.AppUse(Fixture.KODI.pkg, 118_356, null),
+            com.thefactor1.taskskiller.status.SystemStats.AppUse(Fixture.YOUTUBE.pkg, 85_106, 2.0)
+        ),
+        onScreen = Fixture.TIVI.pkg
+    )
+
+    @Test fun systemStruggling() = checkSystem("system-struggling", struggling = true)
+
+    @Test fun systemSmooth() = checkSystem("system-smooth", struggling = false)
+
+    private fun checkSystem(name: String, struggling: Boolean) {
+        com.thefactor1.taskskiller.status.SystemReader.override = { systemSnapshot(struggling) }
+        try {
+            val a = launch(SystemActivity::class.java)
+            idleFor(400)
+            val list = a.findViewById<RecyclerView>(R.id.appList)
+            val rows = (0 until list.childCount).map { list.getChildAt(it) }
+            val meters = listOf(R.id.memMeter, R.id.swapMeter, R.id.cpuMeter, R.id.storageMeter).map { a.findViewById<View>(it) }
+            val problems = common(a.window.decorView.findViewById(android.R.id.content)) +
+                LayoutCheck.leftAt(a.findViewById(R.id.appsHeader), gutter) +
+                LayoutCheck.sameLeft("system column", a.findViewById(R.id.appsHeader), *rows.toTypedArray()) +
+                LayoutCheck.sameRight("app rows", *rows.toTypedArray()) +
+                LayoutCheck.sameHeight("app rows", rows) +
+                LayoutCheck.sameLeft("meters", *meters.toTypedArray()) +
+                LayoutCheck.sameRight("meters", *meters.toTypedArray()) +
+                rightAtGutter(a.findViewById(R.id.meterPanel)) + rightAtGutter(a.findViewById(R.id.systemVerdict)) +
+                (if (rows.size < 5) listOf("only ${rows.size} app rows fit on screen") else emptyList()) +
+                (if (rows.firstOrNull()?.hasFocus() != true) listOf("first app row is not focused") else emptyList())
+            shoot(a, name)
+            assertNoProblems(name, problems)
+        } finally {
+            com.thefactor1.taskskiller.status.SystemReader.override = null
+        }
+    }
+
     // ---------- Setup ----------
 
     @Test fun setupHealthy() = checkSetup("setup-healthy")

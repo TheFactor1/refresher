@@ -76,6 +76,7 @@ class MainActivity : AppCompatActivity() {
         binding.appsRecycler.isFocusable = false
 
         binding.fixButton.setOnClickListener { report?.let { runFix(it.fix) } }
+        binding.systemButton.setOnClickListener { startActivity(Intent(this, SystemActivity::class.java)) }
         binding.activityButton.setOnClickListener { startActivity(Intent(this, LogActivity::class.java)) }
         binding.setupButton.setOnClickListener { startActivity(Intent(this, SetupActivity::class.java)) }
 

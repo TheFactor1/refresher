@@ -151,6 +151,14 @@ class RestartService : Service() {
             return
         }
 
+        // Never stop the app on screen on a schedule: wait and retry instead.
+        val inFront = if (displayWasOff) null else ForegroundApp.packageName(this, backend)
+        if (OnScreenGuard.shouldDefer(manual, !displayWasOff, inFront, rule.packageName)) {
+            record(rule, "Deferred: ${rule.label} is on screen", success = true, advanceClock = false)
+            RestartScheduler.scheduleAt(this, rule.id, System.currentTimeMillis() + minOf(rule.intervalMillis, DEFER_RETRY_MS))
+            return
+        }
+
         // What was on screen, so the relaunch does not leave the viewer looking
         // at the relaunched app. Run now starts from our own editor, so without
         // a shell to ask, Refresher is the answer; the Refresh now tile starts

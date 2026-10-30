@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- System: how hard the TV is working, and which apps are using it. Same frame as Activity: list left, panel right. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Screen"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/Text.Crumb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/crumb_system" />
+
+            <TextView
+                android:id="@+id/systemTitle"
+                style="@style/Text.Title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xs"
+                android:accessibilityHeading="true"
+                android:text="@string/system_title" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/systemVerdict"
+            style="@style/Text.Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_l"
+            android:background="@drawable/bg_pill"
+            android:paddingStart="14dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="6dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/space_l"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/appsHeader"
+                style="@style/Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/space_s"
+                android:text="@string/system_apps_header" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/appList"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:overScrollMode="never"
+                    android:scrollbars="none" />
+
+                <TextView
+                    android:id="@+id/systemEmpty"
+                    style="@style/Text.Sub"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/system_reading"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/meterPanel"
+            android:layout_width="300dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/space_xl"
+            android:background="@drawable/bg_panel"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <include android:id="@+id/memMeter" layout="@layout/view_meter" />
+
+            <include
+                android:id="@+id/swapMeter"
+                layout="@layout/view_meter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_m" />
+
+            <include
+                android:id="@+id/cpuMeter"
+                layout="@layout/view_meter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_m" />
+
+            <include
+                android:id="@+id/storageMeter"
+                layout="@layout/view_meter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_m" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

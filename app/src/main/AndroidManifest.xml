@@ -121,6 +121,13 @@
             android:exported="false" />
 
         <activity
+
+            android:name=".ui.SystemActivity"
+
+            android:exported="false" />
+
+
+        <activity
             android:name=".ui.LogActivity"
             android:exported="false" />
 

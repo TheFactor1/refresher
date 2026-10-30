@@ -5,6 +5,11 @@ back, including while the box is asleep. Built for the cases where an app needs
 a periodic kick — VPN clients that drift off a tunnel, streaming apps that
 accumulate cache, anything that behaves better after a cold start.
 
+**New in 0.6.8: System.** From the home screen: memory, swap, processor and
+storage at a glance, and the apps using the most memory. Pick one to stop it
+now or add a stop-only rule. A scheduled refresh never stops the app on
+screen; it waits and tries again.
+
 ## What it is, and what it can see
 
 Refresher does one job: on a schedule you choose, it stops an app on your own
@@ -25,6 +30,8 @@ trust.
 - It does not read your viewing, your files, your contacts or your accounts. It
   stores only your rules (which app, how often, a few switches) and a short
   activity log, on the TV.
+- The **System** page shows how much memory and processor each app is using.
+  It reads that on the TV, only while the page is open, and keeps none of it.
 - Backup of those rules is a single small file on the TV
   (`/data/local/tmp/refresher/backup.json`). It is only app names and
   intervals, and **Setup > Remove Refresher's setup** deletes it.

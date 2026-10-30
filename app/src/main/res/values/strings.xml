@@ -96,7 +96,7 @@
     <string name="privacy_row">Privacy</string>
     <string name="privacy_row_hint">What Refresher can see and does with it</string>
     <string name="privacy_title">Privacy</string>
-    <string name="privacy_body">Refresher stops an app on this TV on a schedule you choose, then opens it again. That is all it does.\n\n•  No account, ads, analytics or tracking.\n•  Nothing is uploaded. The only download is Shizuku itself, from Shizuku\'s own GitHub page, and only if you press Get in Setup. Refresher checks it is signed by Shizuku\'s developer before installing it. Otherwise its only network connection is to this TV itself, for setup.\n•  It can\'t see what you watch, your files or your accounts.\n•  It keeps your rules and a short activity log on this TV, plus a small backup file of app names and intervals.\n•  Remove Refresher\'s setup, under Setup, undoes everything setup changed and deletes the backup.\n\nIt is open source: github.com/TheFactor1/refresher</string>
+    <string name="privacy_body">Refresher stops an app on this TV on a schedule you choose, then opens it again. That is all it does.\n\n•  No account, ads, analytics or tracking.\n•  Nothing is uploaded. The only download is Shizuku itself, from Shizuku\'s own GitHub page, and only if you press Get in Setup. Refresher checks it is signed by Shizuku\'s developer before installing it. Otherwise its only network connection is to this TV itself, for setup.\n•  It can\'t see what you watch, your files or your accounts. The System page shows how much memory and processor each app uses, read on this TV only while that page is open.\n•  It keeps your rules and a short activity log on this TV, plus a small backup file of app names and intervals.\n•  Remove Refresher\'s setup, under Setup, undoes everything setup changed and deletes the backup.\n\nIt is open source: github.com/TheFactor1/refresher</string>
     <string name="privacy_ok">Got it</string>
     <string name="restore_title">Restore your apps?</string>
     <string name="restore_message">Refresher found a backup from %1$s:\n\n%2$s</string>
@@ -229,4 +229,40 @@
     <string name="refresh_now_too_soon">Refreshed less than a minute ago. Try again in a moment.</string>
 
     <string name="adb_body">Only needed if \"Set up automatically\" can\'t connect.\n\nConnect with <b>adb connect &lt;tv-ip&gt;:5555</b>, then run whichever block matches how you want apps stopped.\n\n<b>Shizuku (recommended, no root)</b>\nInstall Shizuku on the TV, then after each reboot run:\n  adb shell \'$(dirname $(pm path moe.shizuku.privileged.api | cut -d: -f2))/lib/arm64/libshizuku.so\'\nOpen Refresher and choose Allow when Shizuku asks.\n\n<b>Device owner (survives reboots, no root)</b>\nOn a box with no accounts added:\n  adb shell dpm set-device-owner com.thefactor1.taskskiller/.kill.AdminReceiver\nEach refresh briefly hides the app, which Android treats as removing and re-adding it: its tile may move on the home screen, and apps that depend on it restart too.\n\n<b>Permissions that have no TV settings screen</b>\n  adb shell appops set com.thefactor1.taskskiller SYSTEM_ALERT_WINDOW allow\n  adb shell dumpsys deviceidle whitelist +com.thefactor1.taskskiller\n\n<b>Root</b>\nNothing to do: grant Refresher root when your superuser app asks.</string>
+    <!-- System screen -->
+    <string name="chip_system">System</string>
+    <string name="crumb_system">Refresher › System</string>
+    <string name="system_title">System</string>
+    <string name="system_apps_header">Using the most memory</string>
+    <string name="system_reading">Reading the TV\'s numbers… This needs Shizuku running (Setup).</string>
+    <string name="system_reading_short">Reading…</string>
+    <string name="system_no_apps">No apps to show yet.</string>
+    <string name="system_verdict_ok">Running smoothly</string>
+    <string name="system_verdict_warn">Getting busy</string>
+    <string name="system_verdict_bad">Struggling</string>
+    <string name="system_memory">Memory</string>
+    <string name="system_swap">Swap</string>
+    <string name="system_cpu">Processor</string>
+    <string name="system_storage">Storage</string>
+    <string name="system_free">%1$s free</string>
+    <string name="system_of">%1$s of %2$s</string>
+    <string name="system_busy">%1$d%% busy</string>
+    <string name="system_memory_hint">Of %1$s · %2$d%% in use</string>
+    <string name="system_swap_ok">Spare room in reserve</string>
+    <string name="system_swap_busy">Squeezing memory to make room</string>
+    <string name="system_cpu_hint">Load %1$s on %2$d cores</string>
+    <string name="system_storage_hint">Of %1$s</string>
+    <string name="system_detail_on_screen">On screen</string>
+    <string name="system_detail_background">In the background</string>
+    <string name="system_detail_background_cpu">In the background · %1$d%% processor</string>
+    <string name="system_using">Using %1$s of memory.</string>
+    <string name="system_using_cpu">Using %1$s of memory and %2$d%% of the processor.</string>
+    <string name="system_on_screen_note">It\'s on screen now, so Refresher leaves it alone.</string>
+    <string name="system_stop_note">Stop now frees it until the app is opened again. A stop-only rule stops it every 2 hours, never while it\'s on screen.</string>
+    <string name="system_stop_now">Stop now</string>
+    <string name="system_add_rule">Add a stop-only rule</string>
+    <string name="system_stopped">Stopped %1$s</string>
+    <string name="system_stop_failed">Couldn\'t stop %1$s: %2$s</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 </resources>

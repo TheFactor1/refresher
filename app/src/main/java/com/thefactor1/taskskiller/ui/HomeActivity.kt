@@ -69,6 +69,7 @@ class HomeActivity : AppCompatActivity() {
     private var appsDirty = true
     private var shownKey: String? = null
     private var focusedOnce = false
+    private var windowFocusedOnce = false
     /** The app the viewer just paused from Home, so its pill stays to press play again. */
     private var pausedHere: String? = null
 
@@ -140,16 +141,22 @@ class HomeActivity : AppCompatActivity() {
         if (appsDirty || apps == null) loadApps() else render()
     }
 
-    /** Home starts on the first app in the dock, once the window can take focus and the dock is filled. */
+    /**
+     * Home starts on the first app in the dock: as soon as the dock is filled, and again when the window first
+     * takes focus (Android hands focus to the first button on screen at that moment).
+     */
     private fun focusDock() {
-        if (!hasWindowFocus() || binding.dockApps.childCount == 0) return
+        val first = binding.dockApps.getChildAt(0)?.findViewById<View>(R.id.tileCard) ?: return
         focusedOnce = true
-        binding.dockApps.getChildAt(0).findViewById<View>(R.id.tileCard).requestFocus()
+        first.requestFocus()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        if (hasFocus && !focusedOnce) focusDock()
+        if (hasFocus && !windowFocusedOnce) {
+            windowFocusedOnce = true
+            if (!binding.dock.hasFocus()) focusDock()
+        }
     }
 
     /** Home eases in when you come back to it. */

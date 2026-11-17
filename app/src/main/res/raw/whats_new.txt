@@ -1,3 +1,6 @@
+## 0.7.2
+Refresher no longer slows the TV down. Nothing runs in the background any more: the last-hour chart takes its readings only while Home or System is open, and finds the biggest app 30 times more cheaply. System reads its app list when you open it (or stop an app) instead of every 15 seconds.
+
 ## 0.7.1
 New: Refresher Home, a light launcher. A big clock, how the TV is doing (memory, processor, storage), and a dock of your favourite apps with All apps beside it. Clean up stops background apps over a size you choose, never the one on screen, your VPN, or music that's playing. Hold OK or press Menu on an app to favourite, move, hide, stop it or see its info. To make it the TV's home screen, open Home settings › Home screen.
 Home takes on the colour of the app you select, with the clock inside a ring that shows free memory. It also shows your Wi-Fi and whether the VPN is on. Three colour themes (Midnight, Aurora, Ember) in Home settings. Everything fits on one screen, so nothing is ever cut off.

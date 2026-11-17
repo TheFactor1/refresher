@@ -127,7 +127,6 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        HistorySampler.arm(this)
         applyTheme()
         registerReceiver(tick, IntentFilter().apply {
             addAction(Intent.ACTION_TIME_TICK); addAction(Intent.ACTION_TIME_CHANGED); addAction(Intent.ACTION_TIMEZONE_CHANGED)
@@ -252,7 +251,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     /**
-     * Memory from /proc/meminfo (one small file, no shell), the processor from Refresher's own minute readings,
+     * Memory from /proc/meminfo (one small file, no shell), the processor from Refresher's minute readings (taken here, while Home is on screen),
      * storage from the file system; what's playing through Shizuku when it's running.
      */
     private fun readHealth() {
@@ -261,6 +260,7 @@ class HomeActivity : AppCompatActivity() {
         worker.execute {
             val mem = runCatching { SystemStats.parseMeminfo(meminfo()) }.getOrNull()
             val total = mem?.get("MemTotal"); val avail = mem?.get("MemAvailable")
+            if (showHealth) runCatching { HistorySampler.sampleIfDue(this) }
             val cpu = if (showHealth) runCatching { SystemHistory.load(this).lastOrNull() }.getOrNull()
                 ?.takeIf { System.currentTimeMillis() - it.at < CPU_FRESH_MS }?.cpuPct else null
             val disk = if (showHealth) runCatching { StatFs(Environment.getDataDirectory().path) }.getOrNull() else null

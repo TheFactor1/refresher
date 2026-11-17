@@ -246,10 +246,6 @@
         </receiver>
 
         <receiver
-            android:name=".schedule.HistorySampler"
-            android:exported="false" />
-
-        <receiver
             android:name=".setup.ShizukuInstallReceiver"
             android:exported="false" />
 

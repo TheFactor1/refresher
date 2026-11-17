@@ -76,6 +76,21 @@ class SystemStatsTest {
         assertFalse("only the by-process section counts", p.containsKey("com.example.notcounted"))
     }
 
+    @Test fun psAddsAPackagesProcessesAndSkipsSystemParts() {
+        val ps = """
+               RSS NAME
+            111920 com.example.tvplayer
+            168112 system_server
+            159988 com.example.streams:server_process
+             90000 com.example.streams
+            125091 vendor.nvidia.hardware.graphics.composer@2.0-service
+             68991 com.android.systemui
+              2048 [kworker/0:1]
+        """.trimIndent()
+        val p = SystemStats.parsePs(ps)
+        assertEquals(mapOf("com.example.tvplayer" to 111920L, "com.example.streams" to 159988L + 90000L), p)
+    }
+
     @Test fun cpuinfoPerPackage() {
         val c = SystemStats.parseCpuinfo(cpuinfo)
         assertEquals(63.0, c["com.example.tvplayer"]!!, 0.01)

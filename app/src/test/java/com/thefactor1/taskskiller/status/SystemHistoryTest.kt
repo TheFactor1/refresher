@@ -50,12 +50,11 @@ class SystemHistoryTest {
         assertNull(back[0].cpuPct); assertEquals("com.example.big", back[0].hog); assertEquals(33, back[1].cpuPct)
     }
 
-    @Test fun theSamplerNeverWakesASleepingTv() {
-        HistorySampler.arm(ctx)
+    @Test fun theSamplerTakesOneReadingAMinuteAndSchedulesNothing() {
+        HistorySampler.sampleIfDue(ctx)
+        HistorySampler.sampleIfDue(ctx)
+        assertEquals("a second call within the minute is skipped", 1, SystemHistory.load(ctx).size)
         val am = ctx.getSystemService(AlarmManager::class.java)
-        val next = shadowOf(am).nextScheduledAlarm!!
-        assertEquals(AlarmManager.RTC, next.type)
-        HistorySampler.arm(ctx)
-        assertEquals("re-arming replaces, never stacks", 1, shadowOf(am).scheduledAlarms.size)
+        assertTrue("nothing runs in the background", shadowOf(am).scheduledAlarms.isEmpty())
     }
 }

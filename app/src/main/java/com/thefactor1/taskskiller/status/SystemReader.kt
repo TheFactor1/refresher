@@ -8,8 +8,8 @@ import com.thefactor1.taskskiller.util.ForegroundApp
 
 /**
  * Reads the System screen's numbers through the backend's shell (Shizuku). Only while that screen is open: the
- * cheap system numbers every few seconds, the per-app lists (dumpsys meminfo / cpuinfo, which cost the TV a little
- * work themselves) less often. Nothing is kept or sent anywhere.
+ * cheap system numbers every few seconds, the per-app lists (dumpsys meminfo, about 3 s of work on a busy Shield)
+ * only when the screen opens or after stopping an app. Nothing is kept or sent anywhere.
  */
 class SystemReader(private val context: Context, private val backend: KillBackend) {
 

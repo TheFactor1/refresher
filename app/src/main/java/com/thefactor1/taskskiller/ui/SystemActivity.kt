@@ -46,7 +46,7 @@ class SystemActivity : AppCompatActivity() {
 
     private val ticker = object : Runnable {
         override fun run() {
-            refresh(withApps = ticks % APPS_EVERY == 0)
+            refresh(withApps = ticks == 0)
             ticks++
             binding.root.postDelayed(this, TICK_MS)
         }
@@ -68,7 +68,6 @@ class SystemActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        HistorySampler.arm(this)
         ticks = 0
         binding.root.post(ticker)
     }
@@ -89,6 +88,7 @@ class SystemActivity : AppCompatActivity() {
         val r = reader ?: return
         worker.execute {
             val snap = try { r.read(withApps) } catch (e: Exception) { null }
+            try { HistorySampler.sampleIfDue(this) } catch (e: Exception) {}
             val history = try { SystemHistory.load(this) } catch (e: Exception) { emptyList() }
             runOnUiThread {
                 reading = false
@@ -256,7 +256,6 @@ class SystemActivity : AppCompatActivity() {
 
     companion object {
         private const val TICK_MS = 3_000L
-        private const val APPS_EVERY = 5          // every 5th tick: 15 s
         private const val BUSY_CPU = 20
         private const val RULE_INTERVAL_MINUTES = 120
     }

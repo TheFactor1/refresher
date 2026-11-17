@@ -88,6 +88,7 @@ object SystemStats {
     }
 
     private val PSS = Regex("""^\s*([\d,]+)K: ([A-Za-z][\w.]*\.[\w.]+)(?::[\w.:]+)? \(pid""", RegexOption.MULTILINE)
+    private val PS = Regex("""^\s*(\d+) ([A-Za-z][\w.]*\.[\w.]+)(?::[\w.:]+)?\s*$""", RegexOption.MULTILINE)
     private val CPU = Regex("""^\s*([\d.]+)% \d+/([A-Za-z][\w.]*\.[\w.]+)(?::[\w.:]+)?:""", RegexOption.MULTILINE)
     /** System and hardware processes that look like package names but are not apps someone can stop. */
     private val NOT_APPS = listOf("android.hardware.", "vendor.", "android.process.", "com.android.systemui", "com.android.phone")
@@ -95,10 +96,18 @@ object SystemStats {
     private fun isApp(name: String) = NOT_APPS.none { name.startsWith(it) }
 
     /** "Total PSS by process" from `dumpsys meminfo`: package -> kB, a package's processes added together. */
-    fun parsePss(text: String): Map<String, Long> {
+    fun parsePss(text: String): Map<String, Long> =
+        sumByPackage(PSS, text.substringAfter("Total PSS by process", text).substringBefore("Total PSS by OOM"))
+
+    /**
+     * `ps -A -o RSS,NAME`: package -> kB resident, a package's processes added together. About 30x cheaper than
+     * dumpsys meminfo, but it leaves out graphics memory and anything swapped out, so it is only a hint.
+     */
+    fun parsePs(text: String): Map<String, Long> = sumByPackage(PS, text)
+
+    private fun sumByPackage(regex: Regex, text: String): Map<String, Long> {
         val out = linkedMapOf<String, Long>()
-        val section = text.substringAfter("Total PSS by process", text).substringBefore("Total PSS by OOM")
-        for (m in PSS.findAll(section)) {
+        for (m in regex.findAll(text)) {
             val pkg = m.groupValues[2]
             if (!isApp(pkg)) continue
             out[pkg] = (out[pkg] ?: 0L) + m.groupValues[1].replace(",", "").toLong()

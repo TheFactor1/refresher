@@ -5,17 +5,12 @@ back, including while the box is asleep. Built for the cases where an app needs
 a periodic kick — VPN clients that drift off a tunnel, streaming apps that
 accumulate cache, anything that behaves better after a cold start.
 
-**New in 0.6.8/0.6.9: System.** From the home screen: memory, swap, processor and
-storage at a glance, and the apps using the most memory. Pick one to stop it
-now or add a stop-only rule, plus a chart of the last hour. A scheduled
-refresh never stops the app on screen; it waits and tries again.
+A scheduled refresh never stops the app on screen (it waits and tries again)
+or an app that's playing music.
 
-**New in 0.7.1: Refresher Home.** A light launcher built in: a big clock, the
-TV's health (memory, processor, storage), what's playing with pause and play,
-and a dock of favourites with All apps beside it, in three colour themes.
-**Clean up** stops background apps over a size you choose, never the one on
-screen, a VPN, or music that's playing (scheduled refreshes skip playing apps
-too). Hold OK or press Menu on an app to favourite, move, hide, stop it or open
+**Refresher Home.** A light launcher built in: a big clock, what's playing with
+pause and play, and a dock of favourites with All apps beside it, in three
+colour themes. Hold OK or press Menu on an app to favourite, move, hide, stop it or open
 its info. To make it the TV's home screen, use **Home settings › Home screen**
 (needs Shizuku): Refresher first uses Android's own home-app setting; if the TV
 keeps its launcher anyway, it offers to turn the stock launcher off (never
@@ -41,10 +36,6 @@ trust.
 - It does not read your viewing, your files, your contacts or your accounts. It
   stores only your rules (which app, how often, a few switches) and a short
   activity log, on the TV.
-- The **System** page shows how much memory and processor each app is using,
-  read on the TV while the page is open. Its **Last hour** chart keeps one
-  reading a minute (memory, processor, and the biggest app when memory runs
-  low) in a small file on the TV, only for an hour, only while the TV is on.
 - Backup of those rules is a single small file on the TV
   (`/data/local/tmp/refresher/backup.json`). It is only app names and
   intervals, and **Setup > Remove Refresher's setup** deletes it.

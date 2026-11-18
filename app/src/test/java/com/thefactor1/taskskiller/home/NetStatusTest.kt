@@ -2,7 +2,7 @@ package com.thefactor1.taskskiller.home
 
 import com.thefactor1.taskskiller.home.NetStatus.Link
 import com.thefactor1.taskskiller.home.NetStatus.Net
-import com.thefactor1.taskskiller.status.SystemStats.Level
+import com.thefactor1.taskskiller.home.NetStatus.Level
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

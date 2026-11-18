@@ -196,101 +196,28 @@ class ScreensTest(private val fontScale: Float) {
         assertNoProblems("activity-empty", common(a.window.decorView.findViewById(android.R.id.content)))
     }
 
-    // ---------- System ----------
-
-    private fun systemSnapshot(struggling: Boolean) = com.thefactor1.taskskiller.status.SystemStats.Snapshot(
-        memTotalKb = 3016708, memAvailableKb = if (struggling) 782972 else 1149184,
-        swapTotalKb = 524284, swapFreeKb = if (struggling) 78816 else 400000,
-        load1 = if (struggling) 5.2 else 1.4, cores = 4, cpuBusyPct = if (struggling) 81 else 9,
-        storageFreeBytes = 3_600_000_000, storageTotalBytes = 12_000_000_000,
-        apps = listOf(
-            com.thefactor1.taskskiller.status.SystemStats.AppUse(Fixture.TIVI.pkg, 436_337, 63.0),
-            com.thefactor1.taskskiller.status.SystemStats.AppUse(Fixture.PLEX.pkg, 294_912, 38.0),
-            com.thefactor1.taskskiller.status.SystemStats.AppUse(Fixture.NORD.pkg, 147_330, 13.0),
-            com.thefactor1.taskskiller.status.SystemStats.AppUse(Fixture.PROJECTIVY.pkg, 124_967, 0.4),
-            com.thefactor1.taskskiller.status.SystemStats.AppUse(Fixture.KODI.pkg, 118_356, null),
-            com.thefactor1.taskskiller.status.SystemStats.AppUse(Fixture.YOUTUBE.pkg, 85_106, 2.0)
-        ),
-        onScreen = Fixture.TIVI.pkg
-    )
-
-    /** A realistic hour: steady until a spike 18 min ago (a big app named), a 9-minute sleep gap, then recovery. */
-    private fun systemHour(struggling: Boolean): List<com.thefactor1.taskskiller.status.SystemHistory.Sample> {
-        val now = System.currentTimeMillis()
-        return (0..59).filter { it !in 30..38 }.map { m ->
-            val minAgo = 59 - m
-            val spike = struggling && minAgo in 14..22
-            com.thefactor1.taskskiller.status.SystemHistory.Sample(
-                at = now - minAgo * 60_000L,
-                memUsedPct = if (spike) 88 + (minAgo % 3) else 58 + (m % 5),
-                swapUsedPct = if (spike) 85 else 30,
-                cpuPct = if (spike) 70 + (m % 7) * 3 else 8 + (m % 6) * 2,
-                hog = if (spike && minAgo == 18) Fixture.PLEX.pkg else null,
-                hogKb = if (spike && minAgo == 18) 294_912L else null)
-        }
-    }
-
-    @Test fun systemStruggling() = checkSystem("system-struggling", struggling = true)
-
-    @Test fun systemSmooth() = checkSystem("system-smooth", struggling = false)
-
-    private fun checkSystem(name: String, struggling: Boolean) {
-        com.thefactor1.taskskiller.status.SystemReader.override = { systemSnapshot(struggling) }
-        com.thefactor1.taskskiller.status.SystemHistory.override = { systemHour(struggling) }
-        try {
-            val a = launch(SystemActivity::class.java)
-            val list = a.findViewById<RecyclerView>(R.id.appList)
-            // The app list is read on a background thread: wait for it (up to 5 s) rather than a fixed time.
-            idleUntil(5_000) { list.childCount > 0 && list.getChildAt(0).hasFocus() }
-            val rows = (0 until list.childCount).map { list.getChildAt(it) }
-            val meters = listOf(R.id.memMeter, R.id.swapMeter, R.id.cpuMeter, R.id.storageMeter).map { a.findViewById<View>(it) }
-            val problems = common(a.window.decorView.findViewById(android.R.id.content)) +
-                LayoutCheck.leftAt(a.findViewById(R.id.appsHeader), gutter) +
-                LayoutCheck.sameLeft("system column", a.findViewById(R.id.appsHeader), *rows.toTypedArray()) +
-                LayoutCheck.sameRight("app rows", *rows.toTypedArray()) +
-                LayoutCheck.sameHeight("app rows", rows) +
-                LayoutCheck.sameLeft("meters", *meters.toTypedArray()) +
-                LayoutCheck.sameRight("meters", *meters.toTypedArray()) +
-                rightAtGutter(a.findViewById(R.id.meterPanel)) + rightAtGutter(a.findViewById(R.id.systemVerdict)) +
-                (if (rows.size < 3) listOf("only ${rows.size} app rows fit on screen") else emptyList()) +
-                LayoutCheck.sameLeft("history and list", a.findViewById(R.id.historyCard), a.findViewById(R.id.appsHeader)) +
-                LayoutCheck.sameRight("history and rows", a.findViewById(R.id.historyCard), *rows.toTypedArray()) +
-                (if (rows.firstOrNull()?.hasFocus() != true) listOf("first app row is not focused") else emptyList())
-            shoot(a, name)
-            assertNoProblems(name, problems)
-        } finally {
-            com.thefactor1.taskskiller.status.SystemReader.override = null
-            com.thefactor1.taskskiller.status.SystemHistory.override = null
-        }
-    }
-
     // ---------- Home (the launcher) ----------
 
     @Test fun launcherHome() {
-        HomeActivity.meminfo = { "MemTotal: 2000000 kB\nMemAvailable: 820000 kB\n" }
         com.thefactor1.taskskiller.home.HomePrefs.get(RuntimeEnvironment.getApplication()).favourites =
             listOf(Fixture.TIVI.pkg, Fixture.PLEX.pkg, Fixture.YOUTUBE.pkg)
-        try {
-            val a = launch(HomeActivity::class.java)
-            idleFor(600)
-            val dock = a.findViewById<android.view.ViewGroup>(R.id.dockApps)
-            val cards = (0 until dock.childCount).map { dock.getChildAt(it).findViewById<View>(R.id.tileCard) }
-            val chips = listOf(R.id.cleanChip, R.id.androidChip, R.id.settingsChip).map { a.findViewById<View>(it) }
-            val problems = common(a.window.decorView.findViewById(android.R.id.content), allowEllipsis = { it.id == R.id.tileIconName }) +
-                LayoutCheck.leftAt(a.findViewById(R.id.homeGreeting), gutter) +
-                LayoutCheck.sameHeight("dock tiles", cards) +
-                LayoutCheck.sameHeight("chips", chips) +
-                rightAtGutter(a.findViewById(R.id.settingsChip)) +
-                centred(a, a.findViewById(R.id.homeClock)) + centred(a, a.findViewById(R.id.halo)) + centred(a, a.findViewById(R.id.dock)) +
-                (if (cards.size != 3) listOf("dock shows ${cards.size} favourites, not 3") else emptyList()) +
-                (if (cards.firstOrNull()?.hasFocus() != true) listOf("first favourite is not focused") else emptyList()) +
-                liftedInside(a, cards, 1.12f, a.findViewById(R.id.homeRoot)) +
-                liftedInside(a, listOf(a.findViewById(R.id.allApps)), 1.12f, a.findViewById(R.id.homeRoot))
-            shoot(a, "launcher-home")
-            assertNoProblems("launcher-home", problems)
-        } finally {
-            HomeActivity.meminfo = { java.io.File("/proc/meminfo").readText() }
-        }
+        val a = launch(HomeActivity::class.java)
+        idleFor(600)
+        val dock = a.findViewById<android.view.ViewGroup>(R.id.dockApps)
+        val cards = (0 until dock.childCount).map { dock.getChildAt(it).findViewById<View>(R.id.tileCard) }
+        val chips = listOf(R.id.androidChip, R.id.settingsChip).map { a.findViewById<View>(it) }
+        val problems = common(a.window.decorView.findViewById(android.R.id.content), allowEllipsis = { it.id == R.id.tileIconName }) +
+            LayoutCheck.leftAt(a.findViewById(R.id.homeGreeting), gutter) +
+            LayoutCheck.sameHeight("dock tiles", cards) +
+            LayoutCheck.sameHeight("chips", chips) +
+            rightAtGutter(a.findViewById(R.id.settingsChip)) +
+            centred(a, a.findViewById(R.id.homeClock)) + centred(a, a.findViewById(R.id.halo)) + centred(a, a.findViewById(R.id.dock)) +
+            (if (cards.size != 3) listOf("dock shows ${cards.size} favourites, not 3") else emptyList()) +
+            (if (cards.firstOrNull()?.hasFocus() != true) listOf("first favourite is not focused") else emptyList()) +
+            liftedInside(a, cards, 1.12f, a.findViewById(R.id.homeRoot)) +
+            liftedInside(a, listOf(a.findViewById(R.id.allApps)), 1.12f, a.findViewById(R.id.homeRoot))
+        shoot(a, "launcher-home")
+        assertNoProblems("launcher-home", problems)
     }
 
     @Test fun launcherKeepsSelectionWhenFavouritesChange() {
@@ -341,7 +268,7 @@ class ScreensTest(private val fontScale: Float) {
 
     @Test fun launcherSettings() {
         val a = launch(HomeSettingsActivity::class.java)
-        val rows = listOf(R.id.defaultRow, R.id.themeRow, R.id.tilesRow, R.id.clockRow, R.id.healthRow, R.id.cleanRow, R.id.skipFavsRow).map { a.findViewById<View>(it) }
+        val rows = listOf(R.id.defaultRow, R.id.themeRow, R.id.tilesRow, R.id.clockRow, R.id.playingRow).map { a.findViewById<View>(it) }
         val problems = common(a.window.decorView.findViewById(android.R.id.content)) +
             LayoutCheck.sameLeft("settings rows", *rows.toTypedArray()) + LayoutCheck.leftAt(rows.first(), gutter) +
             LayoutCheck.sameRight("settings rows", *rows.toTypedArray()) + rightAtGutter(rows.first())

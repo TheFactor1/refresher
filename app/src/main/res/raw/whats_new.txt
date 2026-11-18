@@ -1,3 +1,6 @@
+## 0.7.3
+Refresher now only does restarts and Home, with nothing left to slow the TV. Gone: the System screen, its last-hour chart, Clean up, and Home's memory, processor and storage readouts. The ring around Home's clock stays, in the colour of the app you select.
+
 ## 0.7.2
 Refresher no longer slows the TV down. Nothing runs in the background any more: the last-hour chart takes its readings only while Home or System is open, and finds the biggest app 30 times more cheaply. System reads its app list when you open it (or stop an app) instead of every 15 seconds.
 

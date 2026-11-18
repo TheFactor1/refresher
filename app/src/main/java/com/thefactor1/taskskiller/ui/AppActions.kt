@@ -60,7 +60,7 @@ object AppActions {
         worker.execute {
             val r = KillBackends.resolve(ctx).kill(ctx, app.packageName)
             activity.runOnUiThread {
-                Toast.makeText(ctx, if (r.success) ctx.getString(R.string.system_stopped, app.label) else ctx.getString(R.string.system_stop_failed, app.label, r.detail), Toast.LENGTH_SHORT).show()
+                Toast.makeText(ctx, if (r.success) ctx.getString(R.string.app_stopped, app.label) else ctx.getString(R.string.app_stop_failed, app.label, r.detail), Toast.LENGTH_SHORT).show()
             }
         }
     }

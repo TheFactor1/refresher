@@ -4,10 +4,11 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
-import com.thefactor1.taskskiller.status.SystemStats.Level
 
 /** The TV's connection for Home: Wi-Fi (and how strong) or Ethernet, whether it's online, and whether a VPN is on. */
 object NetStatus {
+
+    enum class Level { OK, WARN, BAD }
 
     enum class Link { WIFI, ETHERNET, OTHER, NONE }
 

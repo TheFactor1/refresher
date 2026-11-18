@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Refresher Home, "cinema": the selected app's art fills the screen behind everything. A greeting, what's
-  playing, Clean up and Settings on top; the clock inside a halo that shows free memory, with the processor
-  and storage either side; a dark glass dock of favourites with All apps. One screen: nothing scrolls.
+  playing and Settings on top; the clock inside a ring in the selected app's colour; a dark glass dock of
+  favourites with All apps. One screen: nothing scrolls.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/homeFrame"
@@ -108,13 +108,6 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/cleanChip"
-                style="@style/GlassChip"
-                android:layout_marginEnd="8dp"
-                android:drawableStart="@drawable/ic_sparkle"
-                android:text="@string/home_clean" />
-
-            <TextView
                 android:id="@+id/androidChip"
                 style="@style/GlassChip"
                 android:layout_width="40dp"
@@ -141,17 +134,10 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <include
-                android:id="@+id/cpuStat"
-                layout="@layout/view_home_stat" />
-
             <com.thefactor1.taskskiller.ui.HaloView
                 android:id="@+id/halo"
                 android:layout_width="@dimen/home_halo"
-                android:layout_height="@dimen/home_halo"
-                android:layout_marginStart="32dp"
-                android:layout_marginEnd="32dp"
-                android:contentDescription="@string/system_title">
+                android:layout_height="@dimen/home_halo">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -181,19 +167,8 @@
                         android:maxLines="1"
                         android:textColor="@color/text_primary"
                         android:textSize="96sp" />
-
-                    <TextView
-                        android:id="@+id/haloText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:maxLines="1"
-                        android:textSize="11sp" />
                 </LinearLayout>
             </com.thefactor1.taskskiller.ui.HaloView>
-
-            <include
-                android:id="@+id/diskStat"
-                layout="@layout/view_home_stat" />
         </LinearLayout>
 
         <LinearLayout

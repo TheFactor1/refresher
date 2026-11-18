@@ -62,25 +62,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="6dp" />
             <include
-                android:id="@+id/healthRow"
-                layout="@layout/row_switch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="6dp" />
-            <include
                 android:id="@+id/playingRow"
-                layout="@layout/row_switch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="6dp" />
-            <include
-                android:id="@+id/cleanRow"
-                layout="@layout/row_value"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="6dp" />
-            <include
-                android:id="@+id/skipFavsRow"
                 layout="@layout/row_switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

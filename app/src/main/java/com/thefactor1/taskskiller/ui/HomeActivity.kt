@@ -7,12 +7,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.os.Environment
-import android.os.StatFs
 import android.text.format.DateFormat
 import android.view.KeyEvent
 import android.view.View
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -20,7 +17,6 @@ import com.thefactor1.taskskiller.R
 import com.thefactor1.taskskiller.databinding.ActivityHomeBinding
 import com.thefactor1.taskskiller.databinding.ItemHomeTileBinding
 import com.thefactor1.taskskiller.home.Backdrop
-import com.thefactor1.taskskiller.home.CleanUp
 import com.thefactor1.taskskiller.home.HomeLogic
 import com.thefactor1.taskskiller.home.HomePrefs
 import com.thefactor1.taskskiller.home.HomeTheme
@@ -28,21 +24,16 @@ import com.thefactor1.taskskiller.home.NetStatus
 import com.thefactor1.taskskiller.home.NowPlaying
 import com.thefactor1.taskskiller.home.TileImages
 import com.thefactor1.taskskiller.kill.KillBackends
-import com.thefactor1.taskskiller.schedule.HistorySampler
-import com.thefactor1.taskskiller.status.SystemHistory
-import com.thefactor1.taskskiller.status.SystemStats
-import com.thefactor1.taskskiller.status.SystemStats.Level
 import com.thefactor1.taskskiller.util.PackageUtil
-import java.io.File
 import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.Executors
 
 /**
- * Refresher Home, the launcher, "cinema": the selected app's art fills the screen, the clock sits in a halo that
- * shows free memory, and a dock holds favourites and All apps. One screen, nothing scrolls. Built to stay light:
+ * Refresher Home, the launcher, "cinema": the selected app's art fills the screen, the clock sits in a ring of
+ * its colour, and a dock holds favourites and All apps. One screen, nothing scrolls. Built to stay light:
  * plain views and drawables, six small tile images (the backdrop art is a 32x18 copy), the app list read only
- * when apps change, readings every 30 s only while Home is showing, and nothing animating while it sits still.
+ * when apps change, what's playing and the network read every 30 s only while Home is showing, and nothing animating while it sits still.
  */
 class HomeActivity : AppCompatActivity() {
 
@@ -50,10 +41,6 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var prefs: HomePrefs
     private lateinit var theme: HomeTheme
     private lateinit var backdrop: Backdrop
-    /** The selected app's colour (the theme's accent for greys and All apps). */
-    private var focusColor = 0
-    private var level = Level.OK
-    private var haloShown = false
     /** The VPN app's name when exactly one is installed (else the status just says "VPN on"). */
     private var vpnName: String? = null
 
@@ -87,7 +74,7 @@ class HomeActivity : AppCompatActivity() {
 
     private val readings = object : Runnable {
         override fun run() {
-            readHealth()
+            readPlaying()
             readNet()
             binding.root.postDelayed(this, READ_MS)
         }
@@ -99,13 +86,6 @@ class HomeActivity : AppCompatActivity() {
         setContentView(binding.root)
         prefs = HomePrefs.get(this)
 
-        binding.cpuStat.statLabel.setText(R.string.home_meter_cpu)
-        binding.cpuStat.statLabel.gravity = android.view.Gravity.END
-        binding.cpuStat.statValue.gravity = android.view.Gravity.END
-        binding.diskStat.statLabel.setText(R.string.home_meter_storage)
-
-        binding.halo.setOnClickListener { startActivity(Intent(this, SystemActivity::class.java)) }
-        binding.cleanChip.setOnClickListener { cleanUp() }
         binding.settingsChip.setOnClickListener { startActivity(Intent(this, HomeSettingsActivity::class.java)) }
         binding.androidChip.setOnClickListener { AppActions.openTvSettings(this) }
         binding.allApps.setOnClickListener { startActivity(Intent(this, AllAppsActivity::class.java)) }
@@ -132,11 +112,6 @@ class HomeActivity : AppCompatActivity() {
             addAction(Intent.ACTION_TIME_TICK); addAction(Intent.ACTION_TIME_CHANGED); addAction(Intent.ACTION_TIMEZONE_CHANGED)
         })
         showClock()
-        val health = if (prefs.showHealth) View.VISIBLE else View.INVISIBLE
-        binding.halo.visibility = health
-        binding.haloText.visibility = health
-        binding.cpuStat.root.visibility = health
-        binding.diskStat.root.visibility = health
         binding.root.post(readings)
         if (appsDirty || apps == null) loadApps() else render()
     }
@@ -203,17 +178,9 @@ class HomeActivity : AppCompatActivity() {
         tint(t.accent)
     }
 
-    /** The selected app's colour on the halo, its text and the clock's glow. */
+    /** The selected app's colour on the halo and the clock's glow. */
     private fun tint(color: Int) {
-        focusColor = color
-        val ring = when (level) {
-            Level.OK -> color
-            Level.WARN -> ContextCompat.getColor(this, R.color.warn)
-            Level.BAD -> ContextCompat.getColor(this, R.color.bad)
-        }
-        binding.halo.color = ring
-        // Half way to white, so it reads over any backdrop.
-        binding.haloText.setTextColor(androidx.core.graphics.ColorUtils.blendARGB(ring, android.graphics.Color.WHITE, 0.5f))
+        binding.halo.color = color
         binding.homeClock.setShadowLayer(56f, 0f, 0f, android.graphics.Color.argb(0x73, android.graphics.Color.red(color), android.graphics.Color.green(color), android.graphics.Color.blue(color)))
     }
 
@@ -250,34 +217,13 @@ class HomeActivity : AppCompatActivity() {
         binding.homeGreeting.setText(greeting(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)))
     }
 
-    /**
-     * Memory from /proc/meminfo (one small file, no shell), the processor from Refresher's minute readings (taken here, while Home is on screen),
-     * storage from the file system; what's playing through Shizuku when it's running.
-     */
-    private fun readHealth() {
-        val showHealth = prefs.showHealth
+    /** What's playing, through Shizuku when it's running. */
+    private fun readPlaying() {
         val showPlaying = prefs.showNowPlaying
         worker.execute {
-            val mem = runCatching { SystemStats.parseMeminfo(meminfo()) }.getOrNull()
-            val total = mem?.get("MemTotal"); val avail = mem?.get("MemAvailable")
-            if (showHealth) runCatching { HistorySampler.sampleIfDue(this) }
-            val cpu = if (showHealth) runCatching { SystemHistory.load(this).lastOrNull() }.getOrNull()
-                ?.takeIf { System.currentTimeMillis() - it.at < CPU_FRESH_MS }?.cpuPct else null
-            val disk = if (showHealth) runCatching { StatFs(Environment.getDataDirectory().path) }.getOrNull() else null
             val playing = if (showPlaying) runCatching { NowPlaying.read(this, KillBackends.resolve(this)) }.getOrNull() else null
             runOnUiThread {
                 if (isFinishing || isDestroyed) return@runOnUiThread
-                if (total != null && avail != null && total > 0) {
-                    level = when { avail * 100 < total * 12 -> Level.BAD; avail * 100 < total * 30 -> Level.WARN; else -> Level.OK }
-                    val pct = (avail * 100 / total).toInt()
-                    binding.halo.setFraction(pct / 100f, animate = !haloShown)
-                    haloShown = true
-                    binding.haloText.text = getString(R.string.home_halo_free, pct)
-                    binding.halo.contentDescription = getString(R.string.home_halo_free, pct)
-                    tint(focusColor)
-                }
-                binding.cpuStat.statValue.text = if (cpu != null) getString(cpuWord(cpu)) else getString(R.string.home_meter_unknown)
-                if (disk != null && disk.totalBytes > 0) binding.diskStat.statValue.text = getString(R.string.home_storage_free, SystemStats.size(disk.availableBytes / 1024))
                 showPlaying(playing?.let { NowPlaying.pick(it, pausedHere) })
             }
         }
@@ -300,7 +246,7 @@ class HomeActivity : AppCompatActivity() {
         worker.execute {
             NowPlaying.playPause(this, KillBackends.resolve(this))
             Thread.sleep(PLAY_SETTLE_MS)
-            runOnUiThread { readHealth() }
+            runOnUiThread { readPlaying() }
         }
     }
 
@@ -431,25 +377,6 @@ class HomeActivity : AppCompatActivity() {
         return b.root
     }
 
-    private fun cleanUp() {
-        binding.cleanChip.isEnabled = false
-        binding.cleanChip.setText(R.string.home_cleaning)
-        worker.execute {
-            val r = runCatching { CleanUp.run(this, KillBackends.resolve(this)) }.getOrNull()
-            runOnUiThread {
-                binding.cleanChip.isEnabled = true
-                binding.cleanChip.setText(R.string.home_clean)
-                val msg = when {
-                    r == null || r.noShell -> getString(R.string.home_clean_needs_shizuku)
-                    r.stopped.isEmpty() -> getString(R.string.home_clean_nothing, prefs.cleanupMb)
-                    else -> getString(R.string.home_clean_done, SystemStats.size(r.freedKb), r.stopped.joinToString(", "))
-                }
-                Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
-                readHealth()
-            }
-        }
-    }
-
     companion object {
         private const val DOCK_SIZE = 6
         private const val DOCK_LIFT = 1.12f
@@ -457,11 +384,7 @@ class HomeActivity : AppCompatActivity() {
         private const val ENTER_MS = 260L
         private const val NET_SETTLE_MS = 400L
         private const val READ_MS = 30_000L
-        private const val CPU_FRESH_MS = 3 * 60_000L
         private const val PLAY_SETTLE_MS = 600L
-
-        /** Test hook: where memory is read from. */
-        internal var meminfo: () -> String = { File("/proc/meminfo").readText() }
 
         /** The line above the clock. */
         fun greeting(hour: Int) = when (hour) {
@@ -469,12 +392,6 @@ class HomeActivity : AppCompatActivity() {
             in 12..16 -> R.string.home_greet_afternoon
             in 17..21 -> R.string.home_greet_evening
             else -> R.string.home_greet_night
-        }
-
-        fun cpuWord(pct: Int) = when {
-            pct < 35 -> R.string.home_cpu_calm
-            pct < 70 -> R.string.home_cpu_busy
-            else -> R.string.home_cpu_hard
         }
     }
 }

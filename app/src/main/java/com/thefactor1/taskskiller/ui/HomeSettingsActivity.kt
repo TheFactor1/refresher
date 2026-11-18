@@ -16,7 +16,7 @@ import com.thefactor1.taskskiller.util.PackageUtil
 import android.widget.Toast
 import java.util.concurrent.Executors
 
-/** Home's settings: theme, tile style, clock, what's playing, the health pill, Clean up's size and favourites, hidden apps, shortcuts. */
+/** Home's settings: theme, tile style, clock, what's playing, hidden apps, shortcuts. */
 class HomeSettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeSettingsBinding
@@ -54,25 +54,9 @@ class HomeSettingsActivity : AppCompatActivity() {
             prefs.clock = all[(prefs.clock.ordinal + dir).mod(all.size)]
         }
 
-        binding.healthRow.rowTitle.setText(R.string.home_set_health)
-        binding.healthRow.rowHint.setText(R.string.home_set_health_hint)
-        binding.healthRow.root.setOnClickListener { prefs.showHealth = !prefs.showHealth; show() }
-
         binding.playingRow.rowTitle.setText(R.string.home_set_playing)
         binding.playingRow.rowHint.setText(R.string.home_set_playing_hint)
         binding.playingRow.root.setOnClickListener { prefs.showNowPlaying = !prefs.showNowPlaying; show() }
-
-        binding.cleanRow.rowTitle.setText(R.string.home_set_clean)
-        binding.cleanRow.rowHint.setText(R.string.home_set_clean_hint)
-        stepper(binding.cleanRow) { dir ->
-            val steps = HomePrefs.CLEANUP_STEPS
-            val i = steps.indexOfFirst { it >= prefs.cleanupMb }.coerceAtLeast(0)
-            prefs.cleanupMb = steps[(i + dir).mod(steps.size)]
-        }
-
-        binding.skipFavsRow.rowTitle.setText(R.string.home_set_skip_favs)
-        binding.skipFavsRow.rowHint.setText(R.string.home_set_skip_favs_hint)
-        binding.skipFavsRow.root.setOnClickListener { prefs.cleanupSkipsFavourites = !prefs.cleanupSkipsFavourites; show() }
 
         binding.hiddenRow.rowTitle.setText(R.string.home_set_hidden)
         binding.hiddenRow.root.setOnClickListener { unhide() }
@@ -113,9 +97,6 @@ class HomeSettingsActivity : AppCompatActivity() {
             HomePrefs.Clock.H12 -> R.string.home_clock_12
             HomePrefs.Clock.H24 -> R.string.home_clock_24
         })
-        binding.healthRow.rowSwitch.isChecked = prefs.showHealth
-        binding.cleanRow.rowValue.text = getString(R.string.home_clean_mb, prefs.cleanupMb)
-        binding.skipFavsRow.rowSwitch.isChecked = prefs.cleanupSkipsFavourites
         val n = prefs.hidden.size
         binding.hiddenRow.rowHint.text = if (n == 0) getString(R.string.home_set_hidden_none) else resources.getQuantityString(R.plurals.home_hidden_count, n, n)
     }

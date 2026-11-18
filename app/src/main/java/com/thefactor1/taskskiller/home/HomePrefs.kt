@@ -49,19 +49,6 @@ class HomePrefs private constructor(private val prefs: SharedPreferences) {
         get() = prefs.getStringSet(K_TURNED_OFF, emptySet()).orEmpty().toSet()
         set(v) = prefs.edit().putStringSet(K_TURNED_OFF, v).apply()
 
-    var showHealth: Boolean
-        get() = prefs.getBoolean(K_HEALTH, true)
-        set(v) = prefs.edit().putBoolean(K_HEALTH, v).apply()
-
-    /** Clean up stops background apps using more than this. */
-    var cleanupMb: Int
-        get() = prefs.getInt(K_CLEAN_MB, CLEANUP_STEPS[2])
-        set(v) = prefs.edit().putInt(K_CLEAN_MB, v).apply()
-
-    var cleanupSkipsFavourites: Boolean
-        get() = prefs.getBoolean(K_CLEAN_FAVS, false)
-        set(v) = prefs.edit().putBoolean(K_CLEAN_FAVS, v).apply()
-
     fun toggleFavourite(pkg: String) {
         favourites = if (pkg in favourites) favourites - pkg else favourites + pkg
     }
@@ -77,20 +64,16 @@ class HomePrefs private constructor(private val prefs: SharedPreferences) {
     }
 
     companion object {
-        val CLEANUP_STEPS = intArrayOf(50, 100, 150, 200, 300)
         private const val NAME = "home"
         private const val K_FAVS = "favourites"
         private const val K_HIDDEN = "hidden"
         private const val K_TILES = "tiles"
         private const val K_CLOCK = "clock"
-        private const val K_HEALTH = "health"
         private const val K_THEME = "theme"
         private const val K_WANTS_DEFAULT = "wants_default"
         private const val K_TURNED_OFF = "turned_off"
         private const val K_PREVIOUS_HOME = "previous_home"
         private const val K_NOW_PLAYING = "now_playing"
-        private const val K_CLEAN_MB = "cleanup_mb"
-        private const val K_CLEAN_FAVS = "cleanup_skips_favourites"
 
         fun get(context: Context) = HomePrefs(context.applicationContext.getSharedPreferences(NAME, Context.MODE_PRIVATE))
     }

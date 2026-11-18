@@ -5,7 +5,7 @@ import com.thefactor1.taskskiller.kill.KillBackend
 
 /**
  * What's playing, from Android's own media sessions (read through the shell, so no extra permission). Home shows
- * it; Clean up and scheduled refreshes use it to leave music playing in the background alone. Nothing is kept.
+ * it; scheduled refreshes use it to leave music playing in the background alone. Nothing is kept.
  */
 object NowPlaying {
 
